@@ -27,7 +27,7 @@ Crie uma pasta chamada _secrets_ na raíz do repositório para guardar arquivos 
 * Para desativar o ambiente, execute respectivo o arquivo _deactivate_
 
 ### Links úteis
-* Documentação Java 10: https://docs.oracle.com/javase/10/
+* Documentação Java 11: https://docs.oracle.com/javase/11/
 * Documentação Python 3.7: https://docs.python.org/3/
 * Tutorial Gradle: https://guides.gradle.org/building-java-applications/
 * Tutorial Django: https://docs.djangoproject.com/en/2.1/intro/

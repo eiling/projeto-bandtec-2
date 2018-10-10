@@ -1,6 +1,6 @@
 ## Referência Rápida
 ### Linguagens utilizadas e guias de estilo
-* Java 10 - https://google.github.io/styleguide/javaguide.html
+* Java 11 - https://google.github.io/styleguide/javaguide.html
 * HTML5 e CSS3 - https://google.github.io/styleguide/htmlcssguide.html
 * JavaScript (ES6) - https://google.github.io/styleguide/jsguide.html
 * Python 3.7 e Django 2.1 - https://github.com/google/styleguide/blob/gh-pages/pyguide.md

@@ -37,5 +37,4 @@ Crie uma pasta chamada _secrets_ na raíz do repositório para guardar arquivos 
   * for...of loop JavaScript: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of
 * Documentação Git: https://git-scm.com/docs
 * Repositório Maven: https://mvnrepository.com/
-* Documentação PySNMP: http://snmplabs.com/pysnmp/docs/tutorial.html
-* Documentação SNMP4J: https://www.snmp4j.org/html/documentation.html
+

@@ -17,6 +17,9 @@ plugins {
 // Define the main class for the application
 mainClassName = 'App'
 
+targetCompatibility = 11
+sourceCompatibility = 11
+
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.guava:guava:23.0'

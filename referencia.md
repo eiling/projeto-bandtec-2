@@ -37,4 +37,8 @@ Crie uma pasta chamada _secrets_ na raíz do repositório para guardar arquivos 
   * for...of loop JavaScript: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of
 * Documentação Git: https://git-scm.com/docs
 * Repositório Maven: https://mvnrepository.com/
-
+* Material Desing Lite: https://getmdl.io/
+* Node.js: https://nodejs.org/
+* Discord.js: https://discord.js.org/
+* Java SE Tools Reference: https://docs.oracle.com/en/java/javase/11/tools/
+* JSON library for Java: https://github.com/stleary/JSON-java

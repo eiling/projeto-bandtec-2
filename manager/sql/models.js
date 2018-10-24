@@ -11,7 +11,7 @@ const sequelize = new Sequelize(
   },
 );
 
-sequelize
+sequelize  // needed?
   .authenticate()
   .then(() => {
     console.log('Connection has been established successfully.');
@@ -20,22 +20,10 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-const User = sequelize.define('user', {
-  name: {
-    type: Sequelize.STRING,
-  },
-  username: {
-    type: Sequelize.STRING,
-    unique: true,
-  },
-  password: {
-    type: Sequelize.STRING,
-  },
-  discordId: {
-    type: Sequelize.STRING,
-  },
-});
+const User = sequelize.import(__dirname + '\\models\\user.js');
 
-module.exports = {
-  User,
-};
+sequelize.sync({force: true});
+
+// module.exports = {
+//   User,
+// };

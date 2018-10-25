@@ -1,0 +1,28 @@
+<form id="login-form">
+  {% csrf_token %}
+  <input placeholder="user/passwd" name="username"><br>
+  <input name="password" type="password"><br>
+  <button type="submit">Submit</button>
+</form>
+
+<a href="/signup">Sign up</a>
+
+<script>
+  const form = document.getElementById('login-form');
+  form.onsubmit = () => {
+    event.preventDefault();
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = () => {
+      if (req.readyState === 4 && req.status === 200) {
+        const obj = JSON.parse(req.responseText);
+
+        if (obj.success) {
+          window.location.reload();
+        }
+      }
+    };
+
+    req.open('POST', '/ajax/login', true);
+    req.send(new FormData(form));
+  };
+</script>

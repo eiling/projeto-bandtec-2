@@ -1,0 +1,45 @@
+<form id="signup-form">
+  {% csrf_token %}
+  <label for="name-field">Name:</label>
+  <input id="name-field" name="name"><br>
+  <label for="username-field">Username:</label>
+  <input id="username-field" name="username"><br>
+  <label for="password-field">Password:</label>
+  <input id="password-field" name="password" type="password"><br>
+  <label for="repeat-password-field">Repeat password:</label>
+  <input id="repeat-password-field" name="repeat-password" type="password"><br>
+  <button type="submit">Submit</button>
+</form>
+
+<script>
+  const form = document.getElementById('signup-form');
+  form.onsubmit = () => {
+    event.preventDefault();
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = () => {
+      if (req.readyState === 4 && req.status === 200) {
+        const obj = JSON.parse(req.responseText);
+
+        switch(obj.status){
+          case 0:
+            alert('Success!');
+
+            break;
+
+          case 1:
+            alert('The passwords don\'t match');
+
+            break;
+
+          default:
+            alert('Something wen\'t wrong');
+
+            break;
+        }
+      }
+    };
+
+    req.open('POST', '/ajax/signup', true);
+    req.send(new FormData(form));
+  };
+</script>

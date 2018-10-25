@@ -34,6 +34,11 @@ server.on('connection', client => {
 
         break;
 
+      case 1:
+        this.send({type: -1, content: {},});
+
+        break;
+
       case 100:  // auth agent
         const id2 = auth(content.username, content.password);
         if (id2 !== 'NULL') {

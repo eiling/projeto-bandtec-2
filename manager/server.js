@@ -3,9 +3,9 @@
 const net = require('net');
 const Protocol = require('./protocol/protocol');
 const AgentState = require('./agent_state');
-const messages = require('./protocol/message_type_constants');
+const messages = require('./protocol/messages');
 
-const models = require('./sql/models');
+// const models = require('./sql/models');
 
 const server = new net.Server();
 const agents = [];
@@ -20,37 +20,37 @@ server.on('connection', client => {
         const id1 = auth(content.username, content.password);
         if (id1 !== 'NULL') {
           this.send({
-            type: 21,
+            type: 0,
             content: {
               id: id1,
             },
           });
         } else {
           this.send({
-            type: 20,
+            type: 1,
             content: {},
           });
         }
 
         break;
 
-      case 1:  // test auth agent
+      case 100:  // auth agent
         const id2 = auth(content.username, content.password);
         if (id2 !== 'NULL') {
           let msg = {
-            type: 11,
+            type: 0,
             content: {
               id: id2,
             }
           };
           this.send(msg);
           agents.push(new AgentState(id2, client).start());
+        } else {
+          this.send({
+            type: 1,
+            content: {},
+          });
         }
-
-        break;
-
-      case 2:  // test agent -- remove later
-        console.log('GAH');
 
         break;
 
@@ -60,7 +60,7 @@ server.on('connection', client => {
           const botSocket = new net.Socket();
           botSocket.connect(12000, 'localhost', () => {
             new Protocol(botSocket, response => {
-              if(response.type === 0){
+              if (response.type === 0) {
                 user.discordId = response.content.discordId;
                 user.save().then(() => {
                   this.send({  // response to webapp
@@ -83,6 +83,24 @@ server.on('connection', client => {
             });
           });
         });
+
+        break;
+
+      case 201:
+        const agent = agents.find(e => e.id === content.userId);
+        if (agent !== undefined) {
+          const data = agent.getLast();
+          console.log(data);
+          this.send({
+            type: 0,
+            content: data,
+          });
+        } else {
+          this.send({
+            type: 1,
+            content: {},
+          });
+        }
 
         break;
 

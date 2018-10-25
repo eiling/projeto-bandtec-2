@@ -1,29 +1,24 @@
 'use strict';
 
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize(
-  'eagledb',
-  'eagle',
-  'eagle',
-  {
-    host: '35.192.159.83',
-    dialect: 'mysql',
-  },
-);
 
-sequelize  // needed?
-  .authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
+const sequelize = require('../secrets/connection');
+
+sequelize.authenticate().then(() => console.log('conectou'));
+
 
 const User = sequelize.import(__dirname + '\\models\\user.js');
+const Computer = sequelize.import(__dirname + '\\models\\computer.js');
+const History = sequelize.import(__dirname + '\\models\\history.js');
 
-sequelize.sync({force: true});
+Computer.hasMany(History,{foreignKey:'id_computer'});
+User.hasMany(Computer, {foreignKey: 'id_user'});
 
-// module.exports = {
-//   User,
-// };
+sequelize.sync({force: true}).then(
+    () => User.build({
+        name: 'Bianca',
+        username: 'bianca',
+        password: 'bianca',
+        discordId: 'ID'
+}).save().then(() => console.log('criado'))
+);

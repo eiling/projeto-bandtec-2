@@ -7,10 +7,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true,
     },
-    password:{
+    password: {
       type: DataTypes.STRING,
     },
-    discordId:{
+    discordId: {
       type: DataTypes.STRING,
     },
   });

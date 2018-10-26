@@ -1,16 +1,18 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('user', {
-    name: {
+  return sequelize.define('history', {
+    gpu: {
       type: DataTypes.STRING,
     },
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
-    },
-    password: {
+    total_memory: {
       type: DataTypes.STRING,
     },
-    discordId: {
+    used_memory: {
+      type: DataTypes.STRING,
+    },
+    total_disc: {
+      type: DataTypes.STRING,
+    },
+    used_disc: {
       type: DataTypes.STRING,
     },
   });

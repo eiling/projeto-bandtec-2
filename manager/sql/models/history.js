@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('history',{
+  return sequelize.define('history', {
     gpu: {
       type: DataTypes.STRING,
     },

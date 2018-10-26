@@ -10,12 +10,12 @@ function AgentState(id, socket) {
   this.socket = socket;
   this.dataQueue = [];
   this.protocol = new Protocol(this.socket, message => {
+    setTimeout(() => this.protocol.send({type: 10, content: {},}), 1000); // request again
+
     this.dataQueue.push(message.content);
     console.log(message.content);
     //handle alert
     //handle persistence (in a promise)
-
-    setTimeout(() => this.protocol.send({type: 10, content: {},}), 1000); // request again
   }).init();
 }
 
@@ -27,7 +27,7 @@ AgentState.prototype.start = function() {
 
 AgentState.prototype.getLast = function() {
   const len = this.dataQueue.length;
-  if (len == 0) {
+  if (len === 0) {
     return {};
   }
   return this.dataQueue[len - 1];

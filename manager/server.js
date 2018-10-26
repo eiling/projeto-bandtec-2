@@ -2,7 +2,8 @@
 
 const net = require('net');
 const Protocol = require('./protocol/protocol');
-const AgentState = require('./agent_state');
+const AgentHandler = require('./agent_handler');
+const WebappHandler = require('./webapp_handler');
 const messages = require('./protocol/messages');
 
 // const models = require('./sql/models');
@@ -13,50 +14,19 @@ const agents = [];
 server.on('connection', client => {
   console.log('New connection: ' + client);
 
-  new Protocol(client, function(message) {
+  new Protocol(client, async function(message) {
     const content = message.content;
     switch (message.type) {
       case 0:  // test auth webapp
-        const id1 = auth(content.username, content.password);
-        if (id1 !== 'NULL') {
-          this.send({
-            type: 0,
-            content: {
-              id: id1,
-            },
-          });
-        } else {
-          this.send({
-            type: 1,
-            content: {},
-          });
-        }
-
+        WebappHandler.authenticateUser(this, content.username, content.password);
         break;
 
       case 1:
         this.send({type: -1, content: {},});
-
         break;
 
       case 100:  // auth agent
-        const id2 = auth(content.username, content.password);
-        if (id2 !== 'NULL') {
-          let msg = {
-            type: 0,
-            content: {
-              id: id2,
-            }
-          };
-          this.send(msg);
-          agents.push(new AgentState(id2, client).start());
-        } else {
-          this.send({
-            type: 1,
-            content: {},
-          });
-        }
-
+        AgentHandler.authenticateUser(this, content.username, content.password, agents, client);
         break;
 
       case 4:  // setup alerts via DM

@@ -14,9 +14,9 @@ Crie uma pasta chamada _secrets_ na raíz do repositório para guardar arquivos 
 ### _Committing_
 * Antes de começar a fazer as mudanças, atualize o repositório local
    * __git pull__
+* Edite e faça o _commit_
 * Crie um novo branch local
    * __git checkout -b BRANCH-NAME__
-* Edite e faça o _commit_
 * Faça o _push_ do branch local para o repositório remoto
   * __git push -u origin BRANCH-NAME__
 * Crie a _pull request_ no GitHub

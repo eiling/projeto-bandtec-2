@@ -11,4 +11,6 @@ urlpatterns = [
 
     path('ajax/login', ajax.login),
     path('ajax/signup', ajax.signup),
+    path('ajax/setup_dm', ajax.setup_discord_dm),
+    path('ajax/query_data', ajax.query_last_data),
 ]

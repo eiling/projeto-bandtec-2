@@ -24,8 +24,8 @@ def login(request):
 
     if resp['type'] == 0:
         request.session['user_id'] = resp['content']['id']
-        obj = {'success': True}
+        obj = {'status': 0}
     else:
-        obj = {'success': False}
+        obj = {'status': 1}
 
     return HttpResponse(json.dumps(obj), content_type='text/JSON')

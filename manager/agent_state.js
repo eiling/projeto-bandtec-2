@@ -10,12 +10,20 @@ function AgentState(id, socket) {
   this.socket = socket;
   this.dataQueue = [];
   this.protocol = new Protocol(this.socket, message => {
-    setTimeout(() => this.protocol.send({type: 10, content: {},}), 1000); // request again
+    if (message.type === 0) {
+      setTimeout(() => this.protocol.send({type: 0, content: {},}), 1000); // request again
 
-    this.dataQueue.push(message.content);
-    console.log(message.content);
-    //handle alert
-    //handle persistence (in a promise)
+      // store date/time from data
+      this.dataQueue.push(message.content);
+      if (this.dataQueue.length > 5) {  // remove old data
+        this.dataQueue.shift();
+      }
+
+      //handle alert
+      //handle persistence (in a promise)
+    } else {
+      //stop
+    }
   }).init();
 }
 

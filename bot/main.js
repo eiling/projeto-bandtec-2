@@ -1,18 +1,17 @@
 'use strict';
 
-// Eagle Guild ID === 487343475445202944
-
 const net = require('net');
+
 const Discord = require('discord.js');
-const Protocol = require('./protocol');
-const messages = require('./messages');
+
+const Protocol = require('./protocol/protocol');
+const RequestHandler = require('./request_handler');
+const messages = require('./protocol/messages');
 
 const client = new Discord.Client();
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
-
-  console.log(client.guilds.get('487343475445202944').name);
 
   let server = new net.Server();
   server.on('connection', socket => {
@@ -20,15 +19,7 @@ client.on('ready', () => {
       const content = message.content;
       switch (message.type) {
         case 0:  // setup alert via dm
-          let id = client.guilds.get('487343475445202944').members.find(m => m.user.tag === content.discordTag).user.id;
-          this.send({
-            type: 0,
-            content: {
-              discordId: id,
-            },
-          });
-          console.log('id sent');
-
+          RequestHandler.setupDiscordDm(this, client, content.tag);
           break;
 
         default:

@@ -11,8 +11,13 @@
   <button type="submit">Submit</button>
 </form>
 
+<div id="panel" hidden></div><br>
+<a href="/">Back</a>
+
 <script>
   const form = document.getElementById('signup-form');
+  const panel = document.getElementById('panel');
+
   form.onsubmit = () => {
     event.preventDefault();
     let req = new XMLHttpRequest();
@@ -20,21 +25,13 @@
       if (req.readyState === 4 && req.status === 200) {
         const obj = JSON.parse(req.responseText);
 
-        switch(obj.status){
-          case 0:
-            alert('Success!');
+        form.hidden = true;
+        panel.hidden = false;
 
-            break;
-
-          case 1:
-            alert('The passwords don\'t match');
-
-            break;
-
-          default:
-            alert('Something wen\'t wrong');
-
-            break;
+        if (obj.status === 0) {
+          panel.innerText = 'Success!';
+        } else {
+          panel.innerText = 'Failure!';
         }
       }
     };

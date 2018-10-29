@@ -1,4 +1,71 @@
 <title>Main</title>
 
-<p>You're in!</p>
-<a href="/logout">Leave</a>
+<p>You're in! <a href="/logout">Leave.</a>
+
+<hr>
+
+<p>Monitor:
+<div id="monitor-data"></div>
+
+<hr>
+
+<p>Join Eagle server first!
+<form id="setup-dm-form">
+  {% csrf_token %}
+  <label for="discord-tag-field">Discord Tag:</label>
+  <input id="discord-tag-field" name="discord-tag">
+  <button type="submit">Submit</button>
+</form>
+<button id="discord-ping" hidden>Ping</button>
+
+<script>
+  const data = document.getElementById('monitor-data');
+  setInterval(() => {
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = () => {
+      if (req.readyState === 4 && req.status === 200) {
+        const obj = JSON.parse(req.responseText);
+
+        if (obj.status === 0) {
+          let content = obj.content;
+          let text = '';
+          for (let p in content) {
+            if (content.hasOwnProperty(p)) {
+              text += content[p].name + ': ' + content[p].value + '\n';
+            }
+          }
+          data.innerText = text.substring(0, text.length - 1);
+        } else {
+          alert('error in query_last_data');
+        }
+      }
+    };
+
+    req.open('GET', '/ajax/query_data', true);
+    req.send();
+  }, 1000);
+
+  const form = document.getElementById('setup-dm-form');
+  form.onsubmit = () => {
+    event.preventDefault();
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = () => {
+      if (req.readyState === 4 && req.status === 200) {
+        const obj = JSON.parse(req.responseText);
+
+        if (obj.status === 0) {
+          const button = document.getElementById('discord-ping');
+          button.hidden = false;
+          button.onclick = () => {
+            alert('NOP');
+          };
+        } else {
+          alert('error in setup_dm');
+        }
+      }
+    };
+
+    req.open('POST', '/ajax/setup_dm', true);
+    req.send(new FormData(form));
+  };
+</script>

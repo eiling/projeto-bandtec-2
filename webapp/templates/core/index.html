@@ -16,8 +16,10 @@
       if (req.readyState === 4 && req.status === 200) {
         const obj = JSON.parse(req.responseText);
 
-        if (obj.success) {
+        if (obj.status === 0) {
           window.location.reload();
+        } else {
+          alert('error in login');
         }
       }
     };

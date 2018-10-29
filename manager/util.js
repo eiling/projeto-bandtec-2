@@ -1,12 +1,16 @@
 'use strict';
 
+const models = require('./sql/models');
+
 function authenticate(username, password) {
-  if (username === 'user' && password === 'passwd') {
-    return "userId";
-  }
-  return 'NULL';
+  return models.User.findOne({
+    where: {
+      username: username,
+      password: password,
+    },
+  });
 }
 
-module.exports = Object.freeze({
+module.exports = {
   authenticate,
-});
+};

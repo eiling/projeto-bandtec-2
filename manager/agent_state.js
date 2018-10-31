@@ -13,6 +13,9 @@ function AgentState(id, socket) {
     if (message.type === 0) {
       setTimeout(() => this.protocol.send({type: 0, content: {},}), 1000); // request again
 
+      // for testing purposes
+      console.log(message.content);
+
       // store date/time from data
       this.dataQueue.push(message.content);
       if (this.dataQueue.length > 5) {  // remove old data
@@ -28,7 +31,7 @@ function AgentState(id, socket) {
 }
 
 AgentState.prototype.start = function() {
-  this.protocol.send({type: 10, content: {},});
+  this.protocol.send({type: 0, content: {},});
 
   return this;
 };

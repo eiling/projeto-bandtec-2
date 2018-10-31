@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = 'agent.Agent'
+mainClassName = 'Main'
 
 targetCompatibility = 11
 sourceCompatibility = 11

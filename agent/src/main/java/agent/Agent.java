@@ -1,21 +1,76 @@
 package agent;
 
+import agent.hardware.FileStores;
+import agent.hardware.Memory;
+import agent.hardware.Processor;
 import org.json.*;
 import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
 import oshi.util.FormatUtil;
-import oshi.util.Util;
-import protocol.ManagerProtocol;
+import util.protocol.Protocol;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Arrays;
 
-public class Agent {
+public class Agent implements AutoCloseable {
+  private final Socket socket;
+  private final Protocol protocol;
+
+  public Agent() throws IOException {
+    socket = new Socket("localhost", 9000);
+    protocol = new Protocol(socket);
+  }
+
+  private void login() throws IOException {
+    while (loginAttempt("a", "a") != null) ;
+  }
+
+  private String loginAttempt(String username, String password) throws IOException {
+    protocol.send(new JSONObject()
+        .put("type", 100)
+        .put("content", new JSONObject()
+            .put("username", username)
+            .put("password", password)
+        )
+    );
+
+    var response = protocol.receive();
+
+    if (response.getInt("type") == 0) {
+      return null;
+    } else {
+      return response.getJSONObject("content").getString("message");
+    }
+  }
+
+  private void loop() throws IOException {
+    while (true) {
+      var request = protocol.receive();
+
+      if (request.getInt("type") != 0) {
+        System.out.println("broke");
+        break;
+      }
+
+      protocol.send(new JSONObject()
+          .put("type", 0)
+          .put("content", new JSONObject()
+              .put("processor", Processor.get())
+              .put("memory", Memory.get())
+              .put("fileStores", FileStores.get())
+          )
+      );
+    }
+  }
+
+  public void start() throws IOException {
+    login();
+    loop();
+  }
+
   public static void main(String[] args) {
     try (
         var socket = new Socket("localhost", 9000);
-        var protocol = new ManagerProtocol(socket)
+        var protocol = new Protocol(socket)
     ) {
       var loginRequest = new JSONObject();
 
@@ -64,5 +119,11 @@ public class Agent {
       e.printStackTrace();
       System.exit(0);
     }
+  }
+
+  @Override
+  public void close() throws IOException {
+    protocol.close();
+    socket.close();
   }
 }

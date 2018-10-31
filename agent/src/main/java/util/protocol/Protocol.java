@@ -1,4 +1,4 @@
-package protocol;
+package util.protocol;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,11 +9,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-public class ManagerProtocol implements AutoCloseable {
+public class Protocol implements AutoCloseable {
   private InputStream input;
   private OutputStream output;
 
-  public ManagerProtocol(Socket socket) throws IOException {
+  public Protocol(Socket socket) throws IOException {
     this.input = socket.getInputStream();
     this.output = socket.getOutputStream();
   }
@@ -56,12 +56,8 @@ public class ManagerProtocol implements AutoCloseable {
   }
 
   @Override
-  public void close(){
-    try {
-      input.close();
-      output.close();
-    } catch (IOException e){
-      e.printStackTrace();
-    }
+  public void close() throws IOException {
+    input.close();
+    output.close();
   }
 }

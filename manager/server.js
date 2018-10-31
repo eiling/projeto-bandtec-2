@@ -8,16 +8,38 @@ const WebappHandler = require('./webapp_handler');
 // const messages = require('./protocol/messages');
 const models = require('./sql/models');
 
-const server = new net.Server();
+const agentListener = new net.Server();
+const webappListener = new net.Server();
+const botListener = new net.Server();
+
 const agents = [];
 
 models.sequelize.sync({force: false}).then(() => {
   console.log('sequelize ready');
 
-  server.on('connection', client => {
-    console.log('New connection: ' + client);
+  agentListener.on('connection', agent => {
+    console.log('New Agent connection');
 
-    new Protocol(client, async function (message) {
+    new Protocol(agent, async function (message) {
+      const content = message.content;
+      switch (message.type){
+        case 0:  // simple auth
+          AgentHandler.authenticateUser(this, content.username, content.password, agents, agent);
+          break;
+
+        default:
+          console.log('unknown message type');
+          break;
+      }
+    }).init();
+  });
+
+  agentListener.listen(9000, 'localhost');
+
+  webappListener.on('connection', socket => {
+    console.log('New WebApp connection');
+
+    new Protocol(socket, async function (message) {
       const content = message.content;
       switch (message.type) {
         case 0:  // auth webapp
@@ -36,10 +58,6 @@ models.sequelize.sync({force: false}).then(() => {
           WebappHandler.setupDiscordDm(this, content.userId, content.userTag);
           break;
 
-        case 100:  // auth agent
-          AgentHandler.authenticateUser(this, content.username, content.password, agents, client);
-          break;
-
         default:
           console.log('unknown message type');
           break;
@@ -47,5 +65,20 @@ models.sequelize.sync({force: false}).then(() => {
     }).init();
   });
 
-  server.listen(9000, 'localhost');
+  webappListener.listen(9001, 'localhost');
+
+  botListener.on('connnection', socket => {
+    console.log('New Bot connection');
+
+    new Protocol(socket, async function (message) {
+      const content = message.content;
+      switch (message.type) {
+        default:
+          console.log('unknown message type');
+          break;
+      }
+    }).init();
+  });
+
+  botListener.listen(9002, 'localhost');
 });

@@ -15,18 +15,16 @@ public class Agent implements AutoCloseable {
   private final Socket socket;
   private final Protocol protocol;
 
+  private boolean loggedIn;
+
   public Agent() throws IOException {
     socket = new Socket("localhost", 9000);
     protocol = new Protocol(socket);
   }
 
-  private void login() throws IOException {
-    while (loginAttempt("a", "a") != null) ;
-  }
-
-  private String loginAttempt(String username, String password) throws IOException {
+  public String login(String username, String password) throws IOException {
     protocol.send(new JSONObject()
-        .put("type", 100)
+        .put("type", 0)
         .put("content", new JSONObject()
             .put("username", username)
             .put("password", password)
@@ -36,6 +34,8 @@ public class Agent implements AutoCloseable {
     var response = protocol.receive();
 
     if (response.getInt("type") == 0) {
+      loggedIn = true;
+
       return null;
     } else {
       return response.getJSONObject("content").getString("message");
@@ -63,7 +63,10 @@ public class Agent implements AutoCloseable {
   }
 
   public void start() throws IOException {
-    login();
+    if(!loggedIn) {
+      throw new IllegalStateException("You must sign in first!");
+    }
+
     loop();
   }
 

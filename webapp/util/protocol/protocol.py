@@ -13,13 +13,27 @@ class Protocol:
         self._send_message(json.dumps(message))
 
     def _receive_message(self):
-        header = bytearray(2)
-        self.socket.recv_into(header, 2)
+        received = 0
+
+        header = bytearray(0)
+
+        while received < 2:
+            temp = self.socket.recv(2)
+            received += len(temp)
+            header += temp
 
         length = (header[0] >> 8) + header[1]
 
-        message = bytearray(length)
-        self.socket.recv_into(message, length)
+        received = 0
+
+        message = bytearray(0)
+
+        while received < length:
+            temp = self.socket.recv(4096)
+            received += len(temp)
+            message += temp
+
+        print(message)
 
         return message  # .decode('utf-8')
 

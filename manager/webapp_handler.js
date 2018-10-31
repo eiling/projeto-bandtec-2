@@ -50,21 +50,11 @@ function signUp(protocol, name, username, password) {
 
 function queryLastData(protocol, userId, agents){
   const agent = agents.find(e => e.id === userId);
+  console.log(agent.getLast());
   if (agent) {
-    const data = agent.getLast();
-
-    const content = {};
-
-    if(data.cpuLoad){
-      content.cpuLoad = {name: 'CPU Load', value: data.cpuLoad};
-    }
-    if(data.memory){
-      content.memory = {name: 'Memory', value: data.memory};
-    }
-
     protocol.send({
       type: 0,
-      content: content,
+      content: agent.getLast(),
     });
   } else {
     protocol.send({

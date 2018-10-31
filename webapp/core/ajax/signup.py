@@ -1,9 +1,8 @@
-import socket
 import json
 
 from django.http import HttpResponse
 
-from util.protocol.protocol import Protocol
+from util.protocol import get_manager_response
 
 
 def signup(request):
@@ -19,24 +18,17 @@ def signup(request):
     if password != repeat:
         return HttpResponse(json.dumps({'status': 1}), content_type='text/JSON')
 
-    manager = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    protocol = Protocol(manager)
-    manager.connect(('localhost', 9000))
-
-    protocol.send({'type': 1, 'content': {
+    res = get_manager_response({'type': 1, 'content': {
         'name': name,
         'username': username,
         'password': password,
     }})
-    resp = protocol.receive()
 
-    manager.close()
-
-    if resp['type'] == 0:
-        # request.session['user_id'] = resp['content']['id']  login the user?
+    if res['type'] == 0:
+        # request.session['user_id'] = res['content']['id']  login the user?
         obj = {'status': 0}
     else:
         obj = {'status': 2}
-        print(resp['content']['message'])
+        print(res['content']['message'])
 
     return HttpResponse(json.dumps(obj), content_type='text/JSON')

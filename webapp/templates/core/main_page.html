@@ -3,9 +3,19 @@
 <p>You're in! <a href="/logout">Leave.</a>
 
 <hr>
-
+<div id="raw"></div>
+<hr>
 <p>Monitor:
-<div id="monitor-data"></div>
+<hr>
+<p>Processor:
+<div id="processor"></div>
+<hr>
+<p>Memory:
+<div id="memory"></div>
+<hr>
+<p>File Stores:
+<div id="file-stores"></div>
+<hr>
 
 <hr>
 
@@ -19,7 +29,8 @@
 <button id="discord-ping" hidden>Ping</button>
 
 <script>
-  const data = document.getElementById('monitor-data');
+  function formatBytes(a,b){if(0==a)return"0 Bytes";var c=1024,d=b||2,e=["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+" "+e[f]}
+
   setInterval(() => {
     let req = new XMLHttpRequest();
     req.onreadystatechange = () => {
@@ -28,13 +39,31 @@
 
         if (obj.status === 0) {
           let content = obj.content;
-          let text = '';
-          for (let p in content) {
-            if (content.hasOwnProperty(p)) {
-              text += content[p].name + ': ' + content[p].value + '\n';
+          document.getElementById('raw').innerText = JSON.stringify(obj.content);
+          if (content.processor){
+            document.getElementById('processor').innerText =
+                'Name: ' + content.processor.name +
+                '\nLoad percentage: ' + content.processor.systemCpuLoad * 100;
+          }
+          if(content.memory){
+            let a = content.memory.available;
+            let t = content.memory.total;
+            document.getElementById('memory').innerText =
+                'Used percentage: ' + (100-(a*100/t)) +
+                '\nAvailable: ' + formatBytes(a) +
+                '\nTotal: ' + formatBytes(t);
+          }
+          if(content.fileStores){
+            const div = document.getElementById('file-stores');
+            div.innerText = '';
+            for(let f of content.fileStores){
+              div.innerText +=
+                  'Mount point: ' + f.mount +
+                  '\nUsed percentage: ' + (100-(f.usableSpace*100/f.totalSpace)) +
+                  '\nUsable: ' + formatBytes(f.usableSpace) +
+                  '\nTotal: ' + formatBytes(f.totalSpace) + '\n';
             }
           }
-          data.innerText = text.substring(0, text.length - 1);
         } else {
           alert('error in query_last_data');
         }

@@ -1,22 +1,15 @@
-import socket
 import json
 
 from django.http import HttpResponse
 
-from util.protocol.protocol import Protocol
+from util.protocol import get_manager_response
 
 
 def query_last_data(request):
     if request.method != 'GET':
         return HttpResponse('Wrong request method. Use GET.', content_type='text/plain')
 
-    manager = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    protocol = Protocol(manager)
-    manager.connect(('localhost', 9000))
-
-    protocol.send({'type': 2, 'content': {'userId': request.session['user_id']}})
-
-    obj = protocol.receive()
+    obj = get_manager_response({'type': 2, 'content': {'userId': request.session['user_id']}})
 
     if obj['type'] == 0:
         response = {

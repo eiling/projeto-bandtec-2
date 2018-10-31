@@ -1,9 +1,8 @@
-import socket
 import json
 
 from django.http import HttpResponse
 
-from util.protocol.protocol import Protocol
+from util.protocol import get_manager_response
 
 
 def login(request):
@@ -13,17 +12,10 @@ def login(request):
     u = request.POST['username']
     p = request.POST['password']
 
-    manager = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    protocol = Protocol(manager)
-    manager.connect(('localhost', 9000))
+    res = get_manager_response({'type': 0, 'content': {'username': u, 'password': p}})
 
-    protocol.send({'type': 0, 'content': {'username': u, 'password': p}})
-    resp = protocol.receive()
-
-    manager.close()
-
-    if resp['type'] == 0:
-        request.session['user_id'] = resp['content']['id']
+    if res['type'] == 0:
+        request.session['user_id'] = res['content']['id']
         obj = {'status': 0}
     else:
         obj = {'status': 1}

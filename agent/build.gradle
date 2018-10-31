@@ -19,3 +19,7 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+//run {
+//    standardInput = System.in
+//}

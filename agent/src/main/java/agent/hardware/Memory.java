@@ -9,7 +9,10 @@ public class Memory {
 
   private final GlobalMemory globalMemory = new SystemInfo().getHardware().getMemory();
 
-  public static JSONObject get(){
+  private Memory() {
+  }
+
+  public static JSONObject get() {
     final var m = instance.globalMemory;
 
     return new JSONObject()

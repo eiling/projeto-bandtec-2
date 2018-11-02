@@ -11,7 +11,10 @@ public class FileStores {
   private final OSFileStore[] fileStores =
       new SystemInfo().getOperatingSystem().getFileSystem().getFileStores();
 
-  public static JSONArray get(){
+  private FileStores() {
+  }
+
+  public static JSONArray get() {
     var fileStores = new JSONArray();
 
     for (var fileStore :

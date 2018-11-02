@@ -10,7 +10,10 @@ public class DiskStores {
 
   private final HWDiskStore[] diskStores = new SystemInfo().getHardware().getDiskStores();
 
-  public static JSONArray get(){
+  private DiskStores() {
+  }
+
+  public static JSONArray get() {
     final var diskStores = instance.diskStores;
 
     final var diskStoresJson = new JSONArray();
@@ -19,7 +22,7 @@ public class DiskStores {
         diskStores) {
       final var diskStoreJson = new JSONObject();
 
-      diskStoreJson.put("name",diskStore.getName());
+      diskStoreJson.put("name", diskStore.getName());
       diskStoreJson.put("size", diskStore.getSize());
 
       final var partitionsJson = new JSONArray();

@@ -50,7 +50,7 @@ function signUp(protocol, name, username, password) {
 
 function queryLastData(protocol, userId, agents){
   const agent = agents.find(e => e.id === userId);
-  console.log(agent.getLast());
+  
   if (agent) {
     protocol.send({
       type: 0,

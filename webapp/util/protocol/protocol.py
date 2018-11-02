@@ -18,22 +18,22 @@ class Protocol:
         header = bytearray(0)
 
         while received < 2:
-            temp = self.socket.recv(2)
+            temp = self.socket.recv(2 - received)
             received += len(temp)
             header += temp
 
-        length = (header[0] >> 8) + header[1]
+        length = (header[0] << 8) + header[1]
+
+        # maybe we can do: length = self.socket.recv(1)[0] << 8 + self.socket.recv(1)[0]
 
         received = 0
 
         message = bytearray(0)
 
         while received < length:
-            temp = self.socket.recv(4096)
+            temp = self.socket.recv(length - received)
             received += len(temp)
             message += temp
-
-        print(message)
 
         return message  # .decode('utf-8')
 
@@ -41,6 +41,9 @@ class Protocol:
         msg = bytearray(message, 'utf-8')
 
         length = len(msg)
+
+        if length > 65535:
+            raise ValueError('Message maximum length is 65535.')
 
         header = bytearray(2)
         header[0] = (length >> 8) & 0xff

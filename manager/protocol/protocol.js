@@ -107,6 +107,12 @@ Protocol.prototype.onData_ = function() {
 Protocol.prototype.send = function(message) {
   let buffer = Buffer.from(JSON.stringify(message), 'utf-8');
 
+  const length = buffer.length;
+
+  if (length > 65535) {
+    throw new Error('Message maximum length is 65535.')
+  }
+
   this.header_(buffer.length);
   this.packet_.message = buffer;
   this.send_();

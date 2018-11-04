@@ -1,3 +1,6 @@
+{% load static %}
+<script src="{% static 'core/js/format_bytes.js' %}"></script>
+
 <title>Main</title>
 
 <p>You're in! <a href="/logout">Leave.</a>
@@ -29,8 +32,6 @@
 <button id="discord-ping" hidden>Ping</button>
 
 <script>
-  function formatBytes(a,b){if(0===a)return"0 Bytes";let c=1024,d=b||2,e=["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+" "+e[f]}
-
   setInterval(() => {
     let req = new XMLHttpRequest();
     req.onreadystatechange = () => {
@@ -65,7 +66,6 @@
             }
           }
         } else {
-          alert('error in query_last_data');
         }
       }
     };

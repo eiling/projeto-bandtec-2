@@ -8,18 +8,40 @@ import oshi.SystemInfo;
 import oshi.util.FormatUtil;
 import util.protocol.Protocol;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Agent implements AutoCloseable {
   private final Socket socket;
   private final Protocol protocol;
+
+  private int id;
 
   private boolean loggedIn;
 
   public Agent() throws IOException {
     socket = new Socket("localhost", 9000);
     protocol = new Protocol(socket);
+
+    id = getId();
+  }
+
+  private int getId(){
+    try{
+      return new Scanner(new File("agent.cfg")).nextInt();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+      return -1;
+    }
+  }
+
+  private void setId(int id){
+    this.id = id;
+
+
   }
 
   public String login(String username, String password) throws IOException {
@@ -28,6 +50,7 @@ public class Agent implements AutoCloseable {
         .put("content", new JSONObject()
             .put("username", username)
             .put("password", password)
+            .put("id", id)
         )
     );
 
@@ -68,60 +91,6 @@ public class Agent implements AutoCloseable {
     }
 
     loop();
-  }
-
-  public static void main(String[] args) {
-    try (
-        var socket = new Socket("localhost", 9000);
-        var protocol = new Protocol(socket)
-    ) {
-      var loginRequest = new JSONObject();
-
-      loginRequest.put("type", 100);
-
-      var content = new JSONObject();
-      content.put("username", "a");
-      content.put("password", "a");
-
-      loginRequest.put("content", content);
-
-      protocol.send(loginRequest);
-
-      var loginResponse = protocol.receive();
-
-      if (loginResponse.getInt("type") == 0) {
-        System.out.println("logged in");
-
-        var sys = new SystemInfo();
-        var hardware = sys.getHardware();
-        var cpu = hardware.getProcessor();
-        var mem = hardware.getMemory();
-
-        while (true) {
-          var serverRequest = protocol.receive();  // PARSE PARAMETERS FROM HERE
-
-          var data = new JSONObject();
-
-          data.put("type", 0);  // not 0 means something wen't wrong
-
-          content = new JSONObject();
-
-          content.put("cpuLoad", String.format("%.1f%%", cpu.getSystemCpuLoad() * 100));
-          content.put("memory", String.format("%.1f%% (%s/%s)",
-              (double) (mem.getTotal() - mem.getAvailable()) * 100 / (double) mem.getTotal(),
-              FormatUtil.formatBytes(mem.getTotal() - mem.getAvailable()),
-              FormatUtil.formatBytes(mem.getTotal())
-          ));
-
-          data.put("content", content);
-
-          protocol.send(data);
-        }
-      }
-    } catch (IOException e) {  // fix this later
-      e.printStackTrace();
-      System.exit(0);
-    }
   }
 
   @Override

@@ -3,25 +3,19 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('computer', {
     name: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
     },
-    network: {
-      type: DataTypes.INTEGER,
-    },
-    disc: {
-      type: DataTypes.INTEGER,
-    },
-    memory: {
+    interval: {
       type: DataTypes.INTEGER,
     },
     cpu: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
     },
-    gpu: {
-      type: DataTypes.INTEGER,
+    memory: {
+      type: DataTypes.BIGINT,
     },
-    monitoring: {
-      type: DataTypes.INTEGER,
+    disc: {
+      type: DataTypes.BIGINT,
     },
   });
 };

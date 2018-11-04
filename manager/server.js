@@ -20,11 +20,18 @@ models.sequelize.sync({force: false}).then(() => {
   agentListener.on('connection', agent => {
     console.log('New Agent connection');
 
+    agent.on('error', () => {
+      const index = agents.find(e => e.socket === agent);
+      if(index !== -1){
+        agents.splice(index, 1);
+      }
+    });
+
     new Protocol(agent, async function (message) {
       const content = message.content;
       switch (message.type){
-        case 0:  // simple auth
-          AgentHandler.authenticateUser(this, content.username, content.password, agents, agent);
+        case 0:  // auth
+          AgentHandler.authenticateUser(this, content.username, content.password, content.id, agents, agent);
           break;
 
         default:

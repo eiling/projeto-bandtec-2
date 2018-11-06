@@ -41,26 +41,26 @@
         if (obj.status === 0) {
           let content = obj.content;
           document.getElementById('raw').innerText = JSON.stringify(obj.content);
-          if (content.processor){
+          if (content.processor) {
             document.getElementById('processor').innerText =
                 'Name: ' + content.processor.name +
                 '\nLoad percentage: ' + content.processor.systemCpuLoad * 100;
           }
-          if(content.memory){
+          if (content.memory) {
             let a = content.memory.available;
             let t = content.memory.total;
             document.getElementById('memory').innerText =
-                'Used percentage: ' + (100-(a*100/t)) +
+                'Used percentage: ' + (100 - (a * 100 / t)) +
                 '\nAvailable: ' + formatBytes(a) +
                 '\nTotal: ' + formatBytes(t);
           }
-          if(content.fileStores){
+          if (content.fileStores) {
             const div = document.getElementById('file-stores');
             div.innerText = '';
-            for(let f of content.fileStores){
+            for (let f of content.fileStores) {
               div.innerText +=
                   'Mount point: ' + f.mount +
-                  '\nUsed percentage: ' + (100-(f.usableSpace*100/f.totalSpace)) +
+                  '\nUsed percentage: ' + (100 - (f.usableSpace * 100 / f.totalSpace)) +
                   '\nUsable: ' + formatBytes(f.usableSpace) +
                   '\nTotal: ' + formatBytes(f.totalSpace) + '\n';
             }

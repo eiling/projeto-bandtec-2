@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('computer', {
+  return sequelize.define('agent', {
     name: {
       type: DataTypes.STRING,
     },

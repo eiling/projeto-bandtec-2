@@ -2,11 +2,12 @@
 
 const Protocol = require('./protocol/protocol');
 
-function AgentState(id, socket) {
+function AgentState(userId, agentId, socket) {
   socket._events.data = undefined;
   socket._events.served = undefined;
 
-  this.id = id;
+  this.userId = userId;
+  this.agentId = agentId;
   this.socket = socket;
   this.dataQueue = [];
   this.protocol = new Protocol(this.socket, async message => {

@@ -8,7 +8,7 @@ const models = require('./sql/models');
 
 function authenticateUser(protocol, username, password) {
   Util.authenticate(username, password).then(user => {
-    if (user !== null) {
+    if (user) {
       protocol.send({
         type: 0,
         content: {
@@ -102,9 +102,13 @@ function setupDiscordDm(protocol, userId, userTag){
   });
 }
 
+function registerAgent(protocol, userId, ){
+}
+
 module.exports = {
   authenticateUser,
   signUp,
   queryLastData,
   setupDiscordDm,
+  registerAgent,
 };

@@ -31,7 +31,7 @@ models.sequelize.sync({force: false}).then(() => {
       const content = message.content;
       switch (message.type){
         case 0:  // auth
-          AgentHandler.authenticateUser(this, content.username, content.password, content.id, agents, agent);
+          AgentHandler.authenticateUser(this, content.username, content.password, content.agentId, agents, agent);
           break;
 
         default:
@@ -89,3 +89,5 @@ models.sequelize.sync({force: false}).then(() => {
 
   botListener.listen(9002, 'localhost');
 });
+
+module.exports = agents;  // for testing purposes

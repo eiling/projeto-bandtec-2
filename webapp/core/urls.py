@@ -7,6 +7,8 @@ urlpatterns = [
     path('', views.index),
     path('signup', views.signup),
     path('main_page', views.main_page),
+    path('test', views.test),
+
     path('logout', views.logout),
 
     path('ajax/login', ajax.login),

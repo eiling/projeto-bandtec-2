@@ -102,7 +102,45 @@ function setupDiscordDm(protocol, userId, userTag){
   });
 }
 
-function registerAgent(protocol, userId, ){
+function getAgents(protocol, userId, agents){
+  models.Agent.findAll({
+    where: {
+      userId: userId,
+    },
+  }).then(registeredAgents => {
+    const connected = agents.filter(e => e.userId === userId);
+
+    const registered = [];
+
+    for (let i of registeredAgents){
+      registered.push({
+        id: i.id,
+
+        connected: false,
+      });
+    }
+    for (let i of registered){
+      if (connected.find(e => e.agentId === i.id)){
+        i.connected = true;
+      }
+    }
+
+    const unregistered = [];
+
+    for (let i of connected.filter(e => e.agentId <= -1)){
+      unregistered.push({
+        id: i.agentId,
+      });
+    }
+
+    protocol.send({
+      type: 0,
+      content: {
+        registered: registered,
+        unregistered: unregistered,
+      }
+    });
+  });
 }
 
 module.exports = {
@@ -110,5 +148,5 @@ module.exports = {
   signUp,
   queryLastData,
   setupDiscordDm,
-  registerAgent,
+  getAgents,
 };

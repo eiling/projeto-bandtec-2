@@ -31,7 +31,9 @@ models.sequelize.sync({force: false}).then(() => {
       const content = message.content;
       switch (message.type){
         case 0:  // auth
-          AgentHandler.authenticateUser(this, content.username, content.password, content.agentId, agents, agent);
+          AgentHandler.authenticateUser(
+            this, content.username, content.password, content.agentId, content.agentName, agents, agent
+          );
           break;
 
         default:
@@ -63,6 +65,10 @@ models.sequelize.sync({force: false}).then(() => {
 
         case 3:  // setup alerts via DM
           WebappHandler.setupDiscordDm(this, content.userId, content.userTag);
+          break;
+
+        case 4:  // get agents
+          WebappHandler.getAgents(this, content.userId, agents);
           break;
 
         default:

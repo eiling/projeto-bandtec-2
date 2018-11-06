@@ -4,7 +4,7 @@ const AgentState = require('./agent_state');
 const Util = require('./util');
 const models = require('./sql/models');
 
-function authenticateUser(protocol, username, password, agentId, agents, socket) {
+function authenticateUser(protocol, username, password, agentId, agentName, agents, socket) {
   Util.authenticate(username, password).then(user => {
     if (user) {
       models.Agent.findOne({
@@ -21,7 +21,7 @@ function authenticateUser(protocol, username, password, agentId, agents, socket)
             },
           });
 
-          agents.push(new AgentState(user.id, agent.id, socket).start());
+          agents.push(new AgentState(user.id, agent.id, agent.name, socket).start());
         } else{  // agent not found
           protocol.send({
             type: 0,
@@ -30,7 +30,7 @@ function authenticateUser(protocol, username, password, agentId, agents, socket)
             },
           });
 
-          agents.push(new AgentState(user.id, Util.getUnregisteredId(user.id, agents), socket).start());
+          agents.push(new AgentState(user.id, Util.getUnregisteredId(user.id, agents), agentName, socket).start());
         }
       });
     } else {

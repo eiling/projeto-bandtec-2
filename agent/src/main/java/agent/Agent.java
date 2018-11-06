@@ -49,6 +49,7 @@ public class Agent implements AutoCloseable {
             .put("username", username)
             .put("password", password)
             .put("agentId", getId())
+            .put("agentName", "NAME")
         )
     );
 

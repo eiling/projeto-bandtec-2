@@ -6,7 +6,8 @@ const Discord = require('discord.js');
 
 const Protocol = require('./protocol/protocol');
 const RequestHandler = require('./request_handler');
-const messages = require('./protocol/messages');
+
+const token = require('./secrets/token');
 
 const client = new Discord.Client();
 
@@ -39,4 +40,4 @@ client.on('message', msg => {
   //handle commands
 });
 
-client.login('NDg3MzE5NjM4ODIxMzA2MzY4.DnL7fA.GPd3LkdSO-NziLzKZ6fmVfQs4Yc').catch(console.log);
+client.login(token).catch(console.log);

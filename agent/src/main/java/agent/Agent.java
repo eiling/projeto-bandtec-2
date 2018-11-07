@@ -1,9 +1,10 @@
 package agent;
 
-import agent.hardware.FileStores;
+import agent.system.FileStores;
 import agent.hardware.Memory;
 import agent.hardware.Processor;
 import org.json.*;
+import oshi.SystemInfo;
 import util.protocol.Protocol;
 
 import java.io.*;
@@ -21,8 +22,8 @@ public class Agent implements AutoCloseable {
   }
 
   private int getId() throws IOException {
-    try {
-      return Integer.parseInt(new BufferedReader(new FileReader("agent.cfg")).readLine());
+    try (var reader = new BufferedReader(new FileReader("agent.cfg"))) {
+      return Integer.parseInt(reader.readLine());
     } catch (FileNotFoundException | NumberFormatException e) {
       new File("agent.cfg").createNewFile();
 
@@ -42,6 +43,16 @@ public class Agent implements AutoCloseable {
     }
   }
 
+  private String getName(){
+    var os = new SystemInfo().getOperatingSystem();
+    return String.format(
+        "%s %s - %d bits",
+        os.getFamily(),
+        os.getVersion().getVersion(),
+        os.getBitness()
+    );
+  }
+
   public String login(String username, String password) throws IOException {
     protocol.send(new JSONObject()
         .put("type", 0)
@@ -49,7 +60,7 @@ public class Agent implements AutoCloseable {
             .put("username", username)
             .put("password", password)
             .put("agentId", getId())
-            .put("agentName", "NAME")
+            .put("agentName", getName())
         )
     );
 

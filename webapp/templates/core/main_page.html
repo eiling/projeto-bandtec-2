@@ -8,18 +8,22 @@
 
 <hr>
 
-<hr>
-<p>Monitor:
-<hr>
-<p>Processor:
-<div id="processor"></div>
-<hr>
-<p>Memory:
-<div id="memory"></div>
-<hr>
-<p>File Stores:
-<div id="file-stores"></div>
-<hr>
+{% if agents %}
+  <p>Registered:
+  <ul>
+    {% for agent in agents.registered %}
+      <li><a href="/details/{{ agent.id }}">{{ agent.name }} - {% if agent.connected %}Connected{% else %}Disconnected{% endif %}</a>
+    {% endfor %}
+  </ul>
+  <p>Unregistered:
+  <ul>
+    {% for agent in agents.unregistered %}
+        <li>{{ agent.name }}
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No agents to display.
+{%  endif %}
 
 <hr>
 
@@ -33,48 +37,6 @@
 <button id="discord-ping" hidden>Ping</button>
 
 <script>
-  setInterval(() => {
-    let req = new XMLHttpRequest();
-    req.onreadystatechange = () => {
-      if (req.readyState === 4 && req.status === 200) {
-        const obj = JSON.parse(req.responseText);
-
-        if (obj.status === 0) {
-          let content = obj.content;
-          document.getElementById('raw').innerText = JSON.stringify(obj.content);
-          if (content.processor) {
-            document.getElementById('processor').innerText =
-                'Name: ' + content.processor.name +
-                '\nLoad percentage: ' + content.processor.systemCpuLoad * 100;
-          }
-          if (content.memory) {
-            let a = content.memory.available;
-            let t = content.memory.total;
-            document.getElementById('memory').innerText =
-                'Used percentage: ' + (100 - (a * 100 / t)) +
-                '\nAvailable: ' + formatBytes(a) +
-                '\nTotal: ' + formatBytes(t);
-          }
-          if (content.fileStores) {
-            const div = document.getElementById('file-stores');
-            div.innerText = '';
-            for (let f of content.fileStores) {
-              div.innerText +=
-                  'Mount point: ' + f.mount +
-                  '\nUsed percentage: ' + (100 - (f.usableSpace * 100 / f.totalSpace)) +
-                  '\nUsable: ' + formatBytes(f.usableSpace) +
-                  '\nTotal: ' + formatBytes(f.totalSpace) + '\n';
-            }
-          }
-        } else {
-        }
-      }
-    };
-
-    req.open('GET', '/ajax/query_data', true);
-    req.send();
-  }, 1000);
-
   const form = document.getElementById('setup-dm-form');
   form.onsubmit = () => {
     event.preventDefault();

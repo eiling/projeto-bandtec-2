@@ -48,20 +48,38 @@ function signUp(protocol, name, username, password) {
   });
 }
 
-function queryLastData(protocol, userId, agents){
-  const agent = agents.find(e => e.id === userId);
-  
-  if (agent) {
-    protocol.send({
-      type: 0,
-      content: agent.getLast(),
-    });
-  } else {
-    protocol.send({
-      type: 1,
-      content: {},
-    });
-  }
+function queryLastData(protocol, userId, agentId, agents){
+  models.Agent.findOne({
+    where: {
+      id: agentId,
+      userId: userId,
+    },
+  }).then(agent => {
+    if (agent) {
+      const agent = agents.find(e => e.agentId === agentId);
+
+      if (agent) {
+        protocol.send({
+          type: 0,
+          content: agent.getLast(),
+        });
+      } else {
+        protocol.send({
+          type: 1,
+          content: {
+            message: 'Agent not connected',
+          },
+        });
+      }
+    } else {
+      protocol.send({
+        type: 2,
+        content: {
+          message: 'Agent not registered.',
+        },
+      });
+    }
+  });
 }
 
 function setupDiscordDm(protocol, userId, userTag){
@@ -115,6 +133,7 @@ function getAgents(protocol, userId, agents){
     for (let i of registeredAgents){
       registered.push({
         id: i.id,
+        name: i.name,
 
         connected: false,
       });
@@ -130,6 +149,7 @@ function getAgents(protocol, userId, agents){
     for (let i of connected.filter(e => e.agentId <= -1)){
       unregistered.push({
         id: i.agentId,
+        name: i.name,
       });
     }
 
@@ -143,10 +163,36 @@ function getAgents(protocol, userId, agents){
   });
 }
 
+function getAgent(protocol, userId, agentId) {
+  models.Agent.findOne({
+    where: {
+      id: agentId,
+      userId: userId,
+    }
+  }).then(agent => {
+    if (agent){
+      protocol.send({
+        type: 0,
+        content: {
+          agent: agent,
+        },
+      });
+    } else {
+      protocol.send({
+        type: 1,
+        content: {
+          message: 'Error in getAgent()',
+        },
+      });
+    }
+  });
+}
+
 module.exports = {
   authenticateUser,
   signUp,
   queryLastData,
   setupDiscordDm,
   getAgents,
+  getAgent,
 };

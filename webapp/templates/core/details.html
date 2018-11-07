@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+{% load static %}
+<script src="{% static 'core/js/format_bytes.js' %}"></script>
+
+<title>Details</title>
+
+{% if agent %}
+  <h3>{{ agent.name }}</h3>
+  <p>Status: <span id="status"></span>
+  <p>Processor:
+  <div id="processor"></div>
+  <hr>
+  <p>Memory:
+  <div id="memory"></div>
+  <hr>
+  <p>File Stores:
+  <div id="file-stores"></div>
+  <hr>
+
+  <script>
+    setInterval(() => {
+      let req = new XMLHttpRequest();
+      req.onreadystatechange = () => {
+        if (req.readyState === 4 && req.status === 200) {
+          const obj = JSON.parse(req.responseText);
+
+          if (obj.status === 0) {
+            document.getElementById('status').innerText = '0';
+
+            let content = obj.content;
+            if (content.processor) {
+              document.getElementById('processor').innerText =
+                  'Name: ' + content.processor.name +
+                  '\nLoad percentage: ' + parseFloat(content.processor.systemCpuLoad * 100).toFixed(1) + '%';
+            }
+            if (content.memory) {
+              let a = content.memory.available;
+              let t = content.memory.total;
+              document.getElementById('memory').innerText =
+                  'Used percentage: ' + parseFloat(100 - (a * 100 / t)).toFixed(1) + '%' +
+                  '\nAvailable: ' + formatBytes(a) +
+                  '\nTotal: ' + formatBytes(t);
+            }
+            if (content.fileStores) {
+              const div = document.getElementById('file-stores');
+              div.innerText = '';
+              for (let f of content.fileStores) {
+                div.innerText +=
+                    'Mount point: ' + f.mount +
+                    '\nUsed percentage: ' + parseFloat(100 - (f.usableSpace * 100 / f.totalSpace)).toFixed(1) + '%' +
+                    '\nUsable: ' + formatBytes(f.usableSpace) +
+                    '\nTotal: ' + formatBytes(f.totalSpace) + '\n';
+              }
+            }
+          } else {
+            document.getElementById('status').innerText = obj.status;
+          }
+        }
+      };
+
+      req.open('GET', '/ajax/query_data?id={{ agent.id }}', true);
+      req.send();
+    }, 1000);
+  </script>
+{% else %}
+  Error.
+{% endif %}

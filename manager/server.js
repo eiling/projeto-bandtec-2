@@ -60,7 +60,7 @@ models.sequelize.sync({force: false}).then(() => {
           break;
 
         case 2:  // get data
-          WebappHandler.queryLastData(this, content.userId, agents);
+          WebappHandler.queryLastData(this, content.userId, content.agentId, agents);
           break;
 
         case 3:  // setup alerts via DM
@@ -69,6 +69,10 @@ models.sequelize.sync({force: false}).then(() => {
 
         case 4:  // get agents
           WebappHandler.getAgents(this, content.userId, agents);
+          break;
+
+        case 5:  // get agents
+          WebappHandler.getAgent(this, content.userId, content.agentId);
           break;
 
         default:

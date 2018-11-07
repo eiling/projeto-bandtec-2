@@ -1,4 +1,4 @@
-package agent.hardware;
+package agent.system;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

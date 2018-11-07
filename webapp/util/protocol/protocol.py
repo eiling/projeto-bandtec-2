@@ -24,8 +24,6 @@ class Protocol:
 
         length = (header[0] << 8) + header[1]
 
-        # maybe we can do: length = self.socket.recv(1)[0] << 8 + self.socket.recv(1)[0]
-
         received = 0
 
         message = bytearray(0)

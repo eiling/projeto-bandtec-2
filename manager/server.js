@@ -5,7 +5,6 @@ const net = require('net');
 const Protocol = require('./protocol/protocol');
 const AgentHandler = require('./agent_handler');
 const WebappHandler = require('./webapp_handler');
-// const messages = require('./protocol/messages');
 const models = require('./sql/models');
 
 const agentListener = new net.Server();
@@ -73,6 +72,10 @@ models.sequelize.sync({force: false}).then(() => {
 
         case 5:  // get agents
           WebappHandler.getAgent(this, content.userId, content.agentId);
+          break;
+
+        case 6:  // send ping
+          WebappHandler.sendPing(this, content.userId);
           break;
 
         default:

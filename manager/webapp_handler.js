@@ -48,7 +48,7 @@ function signUp(protocol, name, username, password) {
   });
 }
 
-function queryLastData(protocol, userId, agentId, agents){
+function queryLastData(protocol, userId, agentId, agents) {
   models.Agent.findOne({
     where: {
       id: agentId,
@@ -82,10 +82,10 @@ function queryLastData(protocol, userId, agentId, agents){
   });
 }
 
-function setupDiscordDm(protocol, userId, userTag){
+function setupDiscordDm(protocol, userId, userTag) {
   models.User.findById(userId).then(user => {
     const botSocket = new net.Socket();
-    botSocket.connect(12000, 'localhost', () => {
+    botSocket.connect(10000, 'localhost', () => {
       new Protocol(botSocket, response => {
         if (response.type === 0) {
           user.discordId = response.content.discordId;
@@ -110,6 +110,8 @@ function setupDiscordDm(protocol, userId, userTag){
           protocol.send(response);  // change this later
           console.log('ERROR');
         }
+
+        botSocket.end();
       }).init().send({
         type: 0,
         content: {
@@ -120,7 +122,7 @@ function setupDiscordDm(protocol, userId, userTag){
   });
 }
 
-function getAgents(protocol, userId, agents){
+function getAgents(protocol, userId, agents) {
   models.Agent.findAll({
     where: {
       userId: userId,
@@ -130,7 +132,7 @@ function getAgents(protocol, userId, agents){
 
     const registered = [];
 
-    for (let i of registeredAgents){
+    for (let i of registeredAgents) {
       registered.push({
         id: i.id,
         name: i.name,
@@ -138,15 +140,15 @@ function getAgents(protocol, userId, agents){
         connected: false,
       });
     }
-    for (let i of registered){
-      if (connected.find(e => e.agentId === i.id)){
+    for (let i of registered) {
+      if (connected.find(e => e.agentId === i.id)) {
         i.connected = true;
       }
     }
 
     const unregistered = [];
 
-    for (let i of connected.filter(e => e.agentId <= -1)){
+    for (let i of connected.filter(e => e.agentId <= -1)) {
       unregistered.push({
         id: i.agentId,
         name: i.name,
@@ -170,7 +172,7 @@ function getAgent(protocol, userId, agentId) {
       userId: userId,
     }
   }).then(agent => {
-    if (agent){
+    if (agent) {
       protocol.send({
         type: 0,
         content: {
@@ -188,6 +190,42 @@ function getAgent(protocol, userId, agentId) {
   });
 }
 
+function sendPing(protocol, userId) {
+  models.User.findById(userId).then(user => {
+    if (user) {
+      if (user.discordId) {
+        const socket = new net.Socket();
+        socket.connect(10000, 'localhost', () => {
+          new Protocol(socket, response => {
+            protocol.send(response);
+
+            socket.end();
+          }).init().send({
+            type: 1,
+            content: {
+              id: user.discordId,
+            },
+          });
+        });
+      } else {
+        protocol.send({
+          type: 1,
+          content: {
+            message: 'Discord ID not registered'
+          }
+        })
+      }
+    } else {
+      protocol.send({
+        type: 2,
+        content: {
+          message: 'User not found. HOW DID THIS HAPPEN???'
+        }
+      })
+    }
+  });
+}
+
 module.exports = {
   authenticateUser,
   signUp,
@@ -195,4 +233,5 @@ module.exports = {
   setupDiscordDm,
   getAgents,
   getAgent,
+  sendPing,
 };

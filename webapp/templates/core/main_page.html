@@ -12,18 +12,19 @@
   <p>Registered:
   <ul>
     {% for agent in agents.registered %}
-      <li><a href="/details/{{ agent.id }}">{{ agent.name }} - {% if agent.connected %}Connected{% else %}Disconnected{% endif %}</a>
+      <li><a href="/details/{{ agent.id }}">{{ agent.name }} - {% if agent.connected %}Connected{% else %}
+      Disconnected{% endif %}</a>
     {% endfor %}
   </ul>
   <p>Unregistered:
   <ul>
     {% for agent in agents.unregistered %}
-        <li>{{ agent.name }}
+      <li>{{ agent.name }}
     {% endfor %}
   </ul>
 {% else %}
   <p>No agents to display.
-{%  endif %}
+{% endif %}
 
 <hr>
 
@@ -34,7 +35,7 @@
   <input id="discord-tag-field" name="discord-tag">
   <button type="submit">Submit</button>
 </form>
-<button id="discord-ping" hidden>Ping</button>
+<button id="discord-ping" onclick="sendPing()">Ping</button>
 
 <script>
   const form = document.getElementById('setup-dm-form');
@@ -46,11 +47,7 @@
         const obj = JSON.parse(req.responseText);
 
         if (obj.status === 0) {
-          const button = document.getElementById('discord-ping');
-          button.hidden = false;
-          button.onclick = () => {
-            alert('NOP');
-          };
+          alert('Done!');
         } else {
           alert('error in setup_dm');
         }
@@ -60,4 +57,20 @@
     req.open('POST', '/ajax/setup_dm', true);
     req.send(new FormData(form));
   };
+
+  function sendPing() {
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = () => {
+      if (req.readyState === 4 && req.status === 200) {
+        const obj = JSON.parse(req.responseText);
+        if (obj.status === 0) {
+          alert('Ping sent');
+        } else {
+          alert('Couldn\'t ping');
+        }
+      }
+    };
+    req.open('GET', '/ajax/ping', true);
+    req.send();
+  }
 </script>

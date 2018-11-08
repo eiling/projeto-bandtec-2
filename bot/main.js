@@ -23,17 +23,19 @@ client.on('ready', () => {
           RequestHandler.setupDiscordDm(this, client, content.tag);
           break;
 
+        case 1:  // send ping
+          RequestHandler.sendPing(this, client, content.id);
+          break;
+
         default:
           console.log('unknown message type');
 
           break;
       }
-
-      socket.end();
     }).init();
   });
 
-  server.listen(12000, 'localhost');
+  server.listen(10000, 'localhost');
 });
 
 client.on('message', msg => {

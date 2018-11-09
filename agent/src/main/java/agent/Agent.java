@@ -96,9 +96,7 @@ public class Agent implements AutoCloseable {
 
         case 1:  //register ID
           setId(request.getJSONObject("content").getInt("id"));
-          protocol.send(new JSONObject()
-              .put("type", 0)
-              .put("content", new JSONObject()));
+          // don't send a response -> log any errors
 
           break;
 

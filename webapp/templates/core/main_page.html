@@ -13,13 +13,13 @@
   <ul>
     {% for agent in agents.registered %}
       <li><a href="/details/{{ agent.id }}">{{ agent.name }} - {% if agent.connected %}Connected{% else %}
-      Disconnected{% endif %}</a>
+      Disconnected{% endif %}</a> "REMOVE BUTTON"
     {% endfor %}
   </ul>
   <p>Unregistered:
   <ul>
     {% for agent in agents.unregistered %}
-      <li>{{ agent.name }}
+      <li><a href="/register_agent/{% widthratio agent.id 1 -1 %}">{{ agent.name }}</a>
     {% endfor %}
   </ul>
 {% else %}

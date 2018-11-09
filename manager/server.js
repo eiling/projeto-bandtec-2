@@ -21,14 +21,14 @@ models.sequelize.sync({force: false}).then(() => {
 
     agent.on('error', () => {
       const index = agents.find(e => e.socket === agent);
-      if(index !== -1){
+      if (index !== -1) {
         agents.splice(index, 1);
       }
     });
 
-    new Protocol(agent, async function (message) {
+    new Protocol(agent, async function(message) {
       const content = message.content;
-      switch (message.type){
+      switch (message.type) {
         case 0:  // auth
           AgentHandler.authenticateUser(
             this, content.username, content.password, content.agentId, content.agentName, agents, agent
@@ -47,7 +47,7 @@ models.sequelize.sync({force: false}).then(() => {
   webappListener.on('connection', socket => {
     console.log('New WebApp connection');
 
-    new Protocol(socket, async function (message) {
+    new Protocol(socket, async function(message) {
       const content = message.content;
       switch (message.type) {
         case 0:  // auth webapp
@@ -78,6 +78,15 @@ models.sequelize.sync({force: false}).then(() => {
           WebappHandler.sendPing(this, content.userId);
           break;
 
+        case 7:
+          WebappHandler.registerAgent(this, content.name, content.interval, content.cpu, content.memory, content.disc,
+            content.userId, content.agentId, agents);
+          break;
+
+        case 8:
+          WebappHandler.getUnregisteredAgent(this, content.userId, content.agentId, agents);
+          break;
+
         default:
           console.log('unknown message type');
           break;
@@ -90,7 +99,7 @@ models.sequelize.sync({force: false}).then(() => {
   botListener.on('connnection', socket => {
     console.log('New Bot connection');
 
-    new Protocol(socket, async function (message) {
+    new Protocol(socket, async function(message) {
       const content = message.content;
       switch (message.type) {
         default:

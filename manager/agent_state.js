@@ -13,42 +13,40 @@ function AgentState(userId, agentId, agentName, socket) {
   this.socket = socket;
   this.dataQueue = [];
   this.protocol = new Protocol(this.socket, async message => {
-    switch (message.type) {
-      case 0:
-        // store date/time from data
-        this.dataQueue.push(message.content);
-        while (this.dataQueue.length > 5) {  // remove old data
-          this.dataQueue.shift();
-        }
+    if (message.type === 0) {
+      // store date/time from data
+      this.dataQueue.push(message.content);
+      while (this.dataQueue.length > 5) {  // remove old data
+        this.dataQueue.shift();
+      }
 
-        //handle alert
-        //handle persistence (in a promise)
+      //handle alert
+      //handle persistence (in a promise)
 
-        // request again
-        setTimeout(() => this.protocol.send({type: 0, content: {},}), 1000);
-        // remove timeout later? to make it real time...
-
-        break;
-
-      default:
-        console.log('Unknown message type');
-        break;
+      // request again
+      setTimeout(() => this.protocol.send({type: 0, content: {},}), 1000 /* - elapsed */);
+      // remove timeout later? to make it real time... maaaaaaaaybe not
     }
   }).init();
 }
 
-AgentState.prototype.start = function () {
-  this.protocol.send({type: 0, content: {},});
+AgentState.prototype.start = function() {
+  // ALL messages to agent should be sent synchronously via the queue
+  setImmediate(() => this.protocol.send({type: 0, content: {},}));
 
   return this;
 };
 
-AgentState.prototype.getLast = function () {
+AgentState.prototype.getLast = function() {
   const len = this.dataQueue.length;
   if (len === 0) {
     return {};
   }
   return this.dataQueue[len - 1];
+};
+
+AgentState.prototype.send = function(message) {
+  setImmediate(() => this.protocol.send(message));
 };
 
 module.exports = AgentState;

@@ -226,6 +226,57 @@ function sendPing(protocol, userId) {
   });
 }
 
+function registerAgent(protocol, name, interval, cpu, memory, disc, userId, agentTempId, agents){
+  const ua = agents.find(e => e.agentId === agentTempId);
+
+  models.Agent.build({
+    name: name || ua.name,
+    interval: interval,
+    cpu: cpu,
+    memory: memory,
+    disc: disc,
+    userId: userId
+  }).save().then(agent => {
+    ua.name = name;
+    ua.agentId = agent.id;
+    // update interval and parameters too
+
+    ua.send({
+      type: 1,
+      content: {
+        id: agent.id,
+      },
+    });
+
+    protocol.send({
+      type: 0,
+      content: {},
+    });
+  });
+}
+
+function getUnregisteredAgent(protocol, userId, agentId, agents){
+  const agent = agents.find(e => e.userId === userId && e.agentId === agentId);
+  if (agent){
+    protocol.send({
+      type: 0,
+      content: {
+        agent: {
+          name: agent.name,
+          id: agent.agentId,
+        },
+      },
+    });
+  } else{
+    protocol.send({
+      type: 1,
+      content: {
+        message: 'Couldn\'t find agent in getUnregisteredAgent',
+      },
+    });
+  }
+}
+
 module.exports = {
   authenticateUser,
   signUp,
@@ -234,4 +285,6 @@ module.exports = {
   getAgents,
   getAgent,
   sendPing,
+  registerAgent,
+  getUnregisteredAgent,
 };

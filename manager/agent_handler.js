@@ -30,7 +30,7 @@ function authenticateUser(protocol, username, password, agentId, agentName, agen
             },
           });
 
-          agents.push(new AgentState(user.id, Util.getUnregisteredId(user.id, agents), agentName, socket).start());
+          agents.push(new AgentState(user.id, Util.getUnregisteredId(user.id, agents), agentName, socket));
         }
       });
     } else {

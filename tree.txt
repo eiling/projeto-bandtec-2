@@ -1,0 +1,13 @@
+﻿projeto-bandtec-2
+├── agent
+├── bot
+│   └── secrets
+│       └── token.js
+├── manager
+│   ├── secrets
+│   │   └── connection.js
+└── webapp
+    ├── secrets
+    │   ├── __init__.py
+    │   └── secret_key.py
+    └── sessiondata

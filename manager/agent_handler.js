@@ -13,7 +13,7 @@ function authenticateUser(protocol, username, password, agentId, agentName, agen
           userId: user.id,
         },
       }).then(agent => {
-        if(agent){
+        if (agent) {
           protocol.send({
             type: 0,
             content: {
@@ -21,16 +21,31 @@ function authenticateUser(protocol, username, password, agentId, agentName, agen
             },
           });
 
-          agents.push(new AgentState(user.id, agent.id, agent.name, socket).start());
-        } else{  // agent not found
-          protocol.send({
-            type: 0,
-            content: {
-              id: -1,
-            },
-          });
+          agents.push(
+            new AgentState(user.id, agent.id, agent.name, agent.interval, agent.cpu, agent.memory, agent.disc, socket)
+              .start()
+          );
+        } else {  // agent not found
+          models.Agent.build({
+            name: agentName,
+            interval: 1000,
+            cpu: -101,
+            memory: -101,
+            disk: -101,
+            userId: user.id,
+          }).save().then(agent => {
+            protocol.send({
+              type: 0,
+              content: {
+                id: agent.id,
+              },
+            });
 
-          agents.push(new AgentState(user.id, Util.getUnregisteredId(user.id, agents), agentName, socket));
+            agents.push(
+              new AgentState(user.id, agent.id, agent.name, agent.interval, agent.cpu, agent.memory, agent.disk, socket)
+                .start()
+            );
+          });
         }
       });
     } else {

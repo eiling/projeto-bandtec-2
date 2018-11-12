@@ -9,17 +9,11 @@
 <hr>
 
 {% if agents %}
-  <p>Registered:
+  <p>Agents:
   <ul>
-    {% for agent in agents.registered %}
-      <li><a href="/details/{{ agent.id }}">{{ agent.name }} - {% if agent.connected %}Connected{% else %}
-      Disconnected{% endif %}</a> "REMOVE BUTTON"
-    {% endfor %}
-  </ul>
-  <p>Unregistered:
-  <ul>
-    {% for agent in agents.unregistered %}
-      <li><a href="/register_agent/{% widthratio agent.id 1 -1 %}">{{ agent.name }}</a>
+    {% for agent in agents %}
+      <li><a href="/details/{{ agent.id }}">{{ agent.name }}</a> - {% if agent.connected %}Connected{% else %}
+      Disconnected{% endif %} | <a href="/config/{{ agent.id }}">Config</a>
     {% endfor %}
   </ul>
 {% else %}

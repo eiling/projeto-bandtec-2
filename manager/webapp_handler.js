@@ -146,20 +146,10 @@ function getAgents(protocol, userId, agents) {
       }
     }
 
-    const unregistered = [];
-
-    for (let i of connected.filter(e => e.agentId <= -1)) {
-      unregistered.push({
-        id: i.agentId,
-        name: i.name,
-      });
-    }
-
     protocol.send({
       type: 0,
       content: {
-        registered: registered,
-        unregistered: unregistered,
+        agents: registered,
       }
     });
   });
@@ -226,55 +216,108 @@ function sendPing(protocol, userId) {
   });
 }
 
-function registerAgent(protocol, name, interval, cpu, memory, disc, userId, agentTempId, agents){
-  const ua = agents.find(e => e.agentId === agentTempId);
+function changeAgentParams(protocol, agentParams, userId, agents) {
+  models.Agent.findOne({
+    where: {
+      id: agentParams.id,
+      userId: userId,
+    },
+  }).then(agent => {
+    if (agent) {
+      if (agentParams.name) {
+        agent.name = agentParams.name;
+      }
+      if (agentParams.interval) {
+        agent.interval = agentParams.interval;
+      }
+      if (agentParams.cpu) {
+        agent.cpu = agentParams.cpu;
+      }
+      if (agentParams.memory) {
+        agent.memory = agentParams.memory;
+      }
+      if (agentParams.disk) {
+        agent.disk = agentParams.disk;
+      }
 
-  models.Agent.build({
-    name: name || ua.name,
-    interval: interval,
-    cpu: cpu,
-    memory: memory,
-    disc: disc,
-    userId: userId
-  }).save().then(agent => {
-    ua.name = name;
-    ua.agentId = agent.id;
-    // update interval and parameters too
+      agent.save().then(() => {
+        const agentState = agents.find(e => e.agentId === agentParams.id);
 
-    ua.send({
-      type: 1,
-      content: {
-        id: agent.id,
-      },
-    });
+        if (agentState) {
+          if (agentParams.name) {
+            agentState.name = agentParams.name;
+          }
+          if (agentParams.interval) {
+            agentState.interval = agentParams.interval;
+          }
+          if (agentParams.cpu) {
+            agentState.cpu = agentParams.cpu;
+          }
+          if (agentParams.memory) {
+            agentState.memory = agentParams.memory;
+          }
+          if (agentParams.disk) {
+            agentState.disk = agentParams.disk;
+          }
+        }
 
-    protocol.send({
-      type: 0,
-      content: {},
-    });
+        protocol.send({
+          type: 0,
+          content: {},
+        });
+      }).catch(err => {
+        protocol.send({
+          type: 2,
+          content: {
+            message: 'Error updating agent - changeAgentParams(); err: ' + err,
+          }
+        });
+      });
+    } else {
+      protocol.send({
+        type: 1,
+        content: {
+          message: 'Agent not found -- changeAgentParams()'
+        },
+      });
+    }
   });
 }
 
-function getUnregisteredAgent(protocol, userId, agentId, agents){
-  const agent = agents.find(e => e.userId === userId && e.agentId === agentId);
-  if (agent){
+function removeAgent(protocol, userId, agentId, agents) {
+  models.Agent.destroy({
+    where: {
+      id: agentId,
+      userId: userId,
+    },
+  }).then(count => {
+    if (count === 1) {
+      const index = agents.findIndex(e => e.agentId === agentId);
+      if (index !== -1) {
+        agents[index].stop();
+        agents.splice(index, 1);
+      }
+
+      protocol.send({
+        type: 0,
+        content: {},
+      });
+    } else {
+      protocol.send({
+        type: 2,
+        content: {
+          message: 'Deleted rows count: ' + count,
+        },
+      });
+    }
+  }).catch(err => {
     protocol.send({
       type: 0,
       content: {
-        agent: {
-          name: agent.name,
-          id: agent.agentId,
-        },
+        message: err.toString(),
       },
     });
-  } else{
-    protocol.send({
-      type: 1,
-      content: {
-        message: 'Couldn\'t find agent in getUnregisteredAgent',
-      },
-    });
-  }
+  });
 }
 
 module.exports = {
@@ -285,6 +328,6 @@ module.exports = {
   getAgents,
   getAgent,
   sendPing,
-  registerAgent,
-  getUnregisteredAgent,
+  changeAgentParams,
+  removeAgent,
 };

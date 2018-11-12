@@ -8,7 +8,7 @@ urlpatterns = [
     path('signup', views.signup),
     path('main_page', views.main_page),
     path('details/<int:agent_id>', views.details),
-    path('register_agent/<int:agent_id>', views.register_agent),
+    path('config/<int:agent_id>', views.agent_config),
 
     path('logout', views.logout),
 
@@ -17,5 +17,6 @@ urlpatterns = [
     path('ajax/setup_dm', ajax.setup_discord_dm),
     path('ajax/query_data', ajax.query_last_data),
     path('ajax/ping', ajax.ping),
-    path('ajax/register_agent', ajax.register_agent),
+    path('ajax/change_agent', ajax.change_agent),
+    path('ajax/remove_agent', ajax.remove_agent),
 ]

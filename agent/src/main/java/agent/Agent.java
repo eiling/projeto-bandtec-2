@@ -43,7 +43,7 @@ public class Agent implements AutoCloseable {
     }
   }
 
-  private String getName(){
+  private String getName() {
     var os = new SystemInfo().getOperatingSystem();
     return String.format(
         "%s %s - %d bits",
@@ -68,6 +68,7 @@ public class Agent implements AutoCloseable {
 
     if (response.getInt("type") == 0) {
       loggedIn = true;
+      setId(response.getJSONObject("content").getInt("id"));
 
       return null;
     } else {
@@ -76,35 +77,21 @@ public class Agent implements AutoCloseable {
   }
 
   private void loop() throws IOException {
-    var running = true;
-
-    while (running) {
+    while (true) {
       var request = protocol.receive();
 
-      switch (request.getInt("type")) {
-        case 0:
-          protocol.send(new JSONObject()
-              .put("type", 0)
-              .put("content", new JSONObject()
-                  .put("processor", Processor.get())
-                  .put("memory", Memory.get())
-                  .put("fileStores", FileStores.get())
-              )
-          );
-
-          break;
-
-        case 1:  //register ID
-          setId(request.getJSONObject("content").getInt("id"));
-          // don't send a response -> log any errors
-
-          break;
-
-        default:
-          System.out.println("broke");
-          running = false;
-
-          break;
+      if (request.getInt("type") == 0) {
+        protocol.send(new JSONObject()
+            .put("type", 0)
+            .put("content", new JSONObject()
+                .put("processor", Processor.get())
+                .put("memory", Memory.get())
+                .put("fileStores", FileStores.get())
+            )
+        );
+      } else {
+        System.out.println("broke");
+        break;
       }
     }
   }

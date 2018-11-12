@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     memory: {
       type: DataTypes.BIGINT,
     },
-    disc: {
+    disk: {  // change to disk
       type: DataTypes.BIGINT,
     },
   });

@@ -20,7 +20,7 @@ models.sequelize.sync({force: false}).then(() => {
     console.log('New Agent connection');
 
     agent.on('error', () => {
-      const index = agents.find(e => e.socket === agent);
+      const index = agents.findIndex(e => e.socket === agent);
       if (index !== -1) {
         agents.splice(index, 1);
       }
@@ -79,12 +79,11 @@ models.sequelize.sync({force: false}).then(() => {
           break;
 
         case 7:
-          WebappHandler.registerAgent(this, content.name, content.interval, content.cpu, content.memory, content.disc,
-            content.userId, content.agentId, agents);
+          WebappHandler.changeAgentParams(this, content.agentParams, content.userId, agents);
           break;
 
         case 8:
-          WebappHandler.getUnregisteredAgent(this, content.userId, content.agentId, agents);
+          WebappHandler.removeAgent(this, content.userId, content.agentId, agents);
           break;
 
         default:

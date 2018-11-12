@@ -2,13 +2,17 @@
 
 const Protocol = require('./protocol/protocol');
 
-function AgentState(userId, agentId, agentName, socket) {
+function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMemory, agentDisk, socket) {
   socket._events.data = undefined;
   socket._events.served = undefined;
 
   this.userId = userId;
   this.agentId = agentId;
   this.name = agentName;
+  this.interval = agentInterval;
+  this.cpu = agentCpu;
+  this.memory = agentMemory;
+  this.disk = agentDisk;
 
   this.socket = socket;
   this.dataQueue = [];
@@ -45,8 +49,8 @@ AgentState.prototype.getLast = function() {
   return this.dataQueue[len - 1];
 };
 
-AgentState.prototype.send = function(message) {
-  setImmediate(() => this.protocol.send(message));
+AgentState.prototype.stop = function() {
+  setImmediate(() => this.protocol.send({type: 1, content: {},}));
 };
 
 module.exports = AgentState;

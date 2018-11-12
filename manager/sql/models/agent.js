@@ -10,12 +10,21 @@ module.exports = (sequelize, DataTypes) => {
     },
     cpu: {
       type: DataTypes.BIGINT,
+      get(){
+        return parseInt(this.getDataValue('cpu'));
+      },
     },
     memory: {
       type: DataTypes.BIGINT,
+      get(){
+        return parseInt(this.getDataValue('memory'));
+      },
     },
-    disk: {  // change to disk
+    disk: {
       type: DataTypes.BIGINT,
+      get(){
+        return parseInt(this.getDataValue('disk'));
+      },
     },
   });
 };

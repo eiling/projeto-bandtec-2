@@ -19,8 +19,11 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
   this.protocol = new Protocol(this.socket, async message => {
     if (message.type === 0) {
       // store date/time from data
+      let data = message.content;
+      data.dateTime = new Date().toISOString();
+
       this.dataQueue.push(message.content);
-      while (this.dataQueue.length > 5) {  // remove old data
+      while (this.dataQueue.length > 1) {  // remove old data
         this.dataQueue.shift();
       }
 
@@ -28,15 +31,38 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
       //handle persistence (in a promise)
 
       // request again
-      setTimeout(() => this.protocol.send({type: 0, content: {},}), 1000 /* - elapsed */);
-      // remove timeout later? to make it real time... maaaaaaaaybe not
+      const resources = [];
+
+      if (this.cpu !== -102){
+        resources.push('cpu');
+      }
+      if (this.memory !== -102){
+        resources.push('memory');
+      }
+      if (this.disk !== -102){
+        resources.push('disk');
+      }
+
+      setTimeout(() => this.protocol.send({type: 0, content: {resources: resources},}), 1000 /* - elapsed */);
     }
   }).init();
 }
 
 AgentState.prototype.start = function() {
+  const resources = [];
+
+  if (this.cpu !== -102){
+    resources.push('cpu');
+  }
+  if (this.memory !== -102){
+    resources.push('memory');
+  }
+  if (this.disk !== -102){
+    resources.push('disk');
+  }
+
   // ALL messages to agent should be sent synchronously via the queue
-  setImmediate(() => this.protocol.send({type: 0, content: {},}));
+  setImmediate(() => this.protocol.send({type: 0, content: {resources: resources},}));
 
   return this;
 };

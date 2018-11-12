@@ -7,6 +7,7 @@
 {% if agent %}
   <h3>{{ agent.name }}</h3>
   <p>Status: <span id="status"></span>
+  <p>Date: <span id="date"></span>
   <p>Processor:
   <div id="processor"></div>
   <hr>
@@ -27,7 +28,10 @@
           if (obj.status === 0) {
             document.getElementById('status').innerText = '0';
 
-            let content = obj.content;
+            const content = obj.content;
+
+            document.getElementById('date').innerText = content.dateTime;
+
             if (content.processor) {
               document.getElementById('processor').innerText =
                   'Name: ' + content.processor.name +
@@ -65,3 +69,4 @@
 {% else %}
   Error
 {% endif %}
+<a href="/main_page">Back</a>

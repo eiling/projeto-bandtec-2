@@ -81,13 +81,32 @@ public class Agent implements AutoCloseable {
       var request = protocol.receive();
 
       if (request.getInt("type") == 0) {
+        var content = new JSONObject();
+
+        var resources = request.getJSONObject("content").getJSONArray("resources");
+
+        for(int i = 0, l = resources.length(); i < l; i++){
+          switch (resources.getString(i)){
+            case "cpu":
+              content.put("processor", Processor.get());
+              break;
+
+            case "memory":
+              content.put("memory", Memory.get());
+              break;
+
+            case "disk":
+              content.put("fileStores", FileStores.get());
+              break;
+
+            default:  // ignore
+              break;
+          }
+        }
+
         protocol.send(new JSONObject()
             .put("type", 0)
-            .put("content", new JSONObject()
-                .put("processor", Processor.get())
-                .put("memory", Memory.get())
-                .put("fileStores", FileStores.get())
-            )
+            .put("content", content)
         );
       } else {
         System.out.println("broke");

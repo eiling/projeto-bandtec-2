@@ -22,7 +22,7 @@ function authenticateUser(protocol, username, password, agentId, agentName, agen
           });
 
           agents.push(
-            new AgentState(user.id, agent.id, agent.name, agent.interval, agent.cpu, agent.memory, agent.disc, socket)
+            new AgentState(user.id, agent.id, agent.name, agent.interval, agent.cpu, agent.memory, agent.disk, socket)
               .start()
           );
         } else {  // agent not found

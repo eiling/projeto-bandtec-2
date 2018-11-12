@@ -2,33 +2,41 @@
 
 const Protocol = require('./protocol/protocol');
 
-function AgentState(id, socket) {
+function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMemory, agentDisk, socket) {
   socket._events.data = undefined;
   socket._events.served = undefined;
 
-  this.id = id;
+  this.userId = userId;
+  this.agentId = agentId;
+  this.name = agentName;
+  this.interval = agentInterval;
+  this.cpu = agentCpu;
+  this.memory = agentMemory;
+  this.disk = agentDisk;
+
   this.socket = socket;
   this.dataQueue = [];
-  this.protocol = new Protocol(this.socket, message => {
+  this.protocol = new Protocol(this.socket, async message => {
     if (message.type === 0) {
-      setTimeout(() => this.protocol.send({type: 0, content: {},}), 1000); // request again
-
       // store date/time from data
       this.dataQueue.push(message.content);
-      if (this.dataQueue.length > 5) {  // remove old data
+      while (this.dataQueue.length > 5) {  // remove old data
         this.dataQueue.shift();
       }
 
       //handle alert
       //handle persistence (in a promise)
-    } else {
-      //stop
+
+      // request again
+      setTimeout(() => this.protocol.send({type: 0, content: {},}), 1000 /* - elapsed */);
+      // remove timeout later? to make it real time... maaaaaaaaybe not
     }
   }).init();
 }
 
 AgentState.prototype.start = function() {
-  this.protocol.send({type: 0, content: {},});
+  // ALL messages to agent should be sent synchronously via the queue
+  setImmediate(() => this.protocol.send({type: 0, content: {},}));
 
   return this;
 };
@@ -39,6 +47,10 @@ AgentState.prototype.getLast = function() {
     return {};
   }
   return this.dataQueue[len - 1];
+};
+
+AgentState.prototype.stop = function() {
+  setImmediate(() => this.protocol.send({type: 1, content: {},}));
 };
 
 module.exports = AgentState;

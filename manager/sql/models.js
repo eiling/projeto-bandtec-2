@@ -3,14 +3,12 @@
 const sequelize = require('../secrets/connection');
 
 const User = sequelize.import(__dirname + '\\models\\user.js');
-const Computer = sequelize.import(__dirname + '\\models\\computer.js');
-const History = sequelize.import(__dirname + '\\models\\history.js');
+const Agent = sequelize.import(__dirname + '\\models\\agent.js');
 
-Computer.hasMany(History, {foreignKey: 'id_computer'});
-User.hasMany(Computer, {foreignKey: 'id_user'});
+User.hasMany(Agent, {foreignKey: 'userId', onDelete: 'CASCADE',});
 
 module.exports = {
   sequelize,
   User,
-  Computer,
+  Agent,
 };

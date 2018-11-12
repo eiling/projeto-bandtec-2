@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+{% if agent %}
+  <h3>Register new agent</h3>
+  <h4>{{ agent.name }}</h4>
+  <form id="change-form">
+    {% csrf_token %}
+    <input name="agent-id" value="{{ agent.id }}" hidden>
+    <label for="name-field">Name:</label>
+    <input name="name" id="name-field" placeholder="{{ agent.name }}"><br>
+    <label for="interval-field">Interval:</label>
+    <input id="interval-field" name="interval"><br>
+    <label for="cpu-field">CPU:</label>
+    <input id="cpu-field" name="cpu"><br>
+    <label for="memory-field">Memory:</label>
+    <input id="memory-field" name="memory"><br>
+    <label for="disk-field">Disk:</label>
+    <input id="disk-field" name="disk"><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <form id="remove-form">
+    {% csrf_token %}
+    <input name="agent-id" value="{{ agent.id }}" hidden>
+    <button type="submit">Remove agent</button>
+  </form>
+
+  <div id="panel" hidden></div><br>
+  <a href="/main_page">Back</a>
+
+  <script>
+    const form = document.getElementById('change-form');
+    const remove = document.getElementById('remove-form');
+    const panel = document.getElementById('panel');
+
+    form.onsubmit = () => {
+      event.preventDefault();
+      let req = new XMLHttpRequest();
+      req.onreadystatechange = () => {
+        if (req.readyState === 4 && req.status === 200) {
+          const obj = JSON.parse(req.responseText);
+
+          panel.hidden = false;
+
+          if (obj.status === 0) {
+            panel.innerText = 'Update done!';
+          } else {
+            panel.innerText = 'Update failed!\n' + obj.message;
+          }
+        }
+      };
+
+      req.open('POST', '/ajax/change_agent', true);
+      req.send(new FormData(form));
+    };
+
+    remove.onsubmit = () => {
+      event.preventDefault();
+      let req = new XMLHttpRequest();
+      req.onreadystatechange = () => {
+        if (req.readyState === 4 && req.status === 200) {
+          const obj = JSON.parse(req.responseText);
+
+          form.hidden = true;
+          remove.hidden = true;
+          panel.hidden = false;
+
+          if (obj.status === 0) {
+            panel.innerText = 'Agent removed!';
+          } else {
+            panel.innerText = 'Delete failed!\n' + obj.message;
+          }
+        }
+      };
+
+      req.open('POST', '/ajax/remove_agent', true);
+      req.send(new FormData(remove));
+    };
+  </script>
+{% else %}
+  Error
+{% endif %}

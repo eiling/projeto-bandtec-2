@@ -9,6 +9,9 @@ public class Processor {
 
   private final CentralProcessor centralProcessor = new SystemInfo().getHardware().getProcessor();
 
+  private Processor() {
+  }
+
   public static JSONObject get() {
     final var p = instance.centralProcessor;
 

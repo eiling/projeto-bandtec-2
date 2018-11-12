@@ -1,14 +1,13 @@
 package agent;
 
-import agent.hardware.FileStores;
+import agent.system.FileStores;
 import agent.hardware.Memory;
 import agent.hardware.Processor;
 import org.json.*;
 import oshi.SystemInfo;
-import oshi.util.FormatUtil;
 import util.protocol.Protocol;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class Agent implements AutoCloseable {
@@ -22,12 +21,46 @@ public class Agent implements AutoCloseable {
     protocol = new Protocol(socket);
   }
 
+  private int getId() throws IOException {
+    try (var reader = new BufferedReader(new FileReader("agent.cfg"))) {
+      return Integer.parseInt(reader.readLine());
+    } catch (FileNotFoundException | NumberFormatException e) {
+      new File("agent.cfg").createNewFile();
+
+      try (var writer = new BufferedWriter(new FileWriter("agent.cfg"))) {
+        writer.write("-1");
+        writer.newLine();
+      }
+
+      return -1;
+    }
+  }
+
+  private void setId(int id) throws IOException {
+    try (var writer = new BufferedWriter(new FileWriter("agent.cfg"))) {
+      writer.write(String.format("%d", id));
+      writer.newLine();
+    }
+  }
+
+  private String getName() {
+    var os = new SystemInfo().getOperatingSystem();
+    return String.format(
+        "%s %s - %d bits",
+        os.getFamily(),
+        os.getVersion().getVersion(),
+        os.getBitness()
+    );
+  }
+
   public String login(String username, String password) throws IOException {
     protocol.send(new JSONObject()
         .put("type", 0)
         .put("content", new JSONObject()
             .put("username", username)
             .put("password", password)
+            .put("agentId", getId())
+            .put("agentName", getName())
         )
     );
 
@@ -35,6 +68,7 @@ public class Agent implements AutoCloseable {
 
     if (response.getInt("type") == 0) {
       loggedIn = true;
+      setId(response.getJSONObject("content").getInt("id"));
 
       return null;
     } else {
@@ -46,82 +80,28 @@ public class Agent implements AutoCloseable {
     while (true) {
       var request = protocol.receive();
 
-      if (request.getInt("type") != 0) {
+      if (request.getInt("type") == 0) {
+        protocol.send(new JSONObject()
+            .put("type", 0)
+            .put("content", new JSONObject()
+                .put("processor", Processor.get())
+                .put("memory", Memory.get())
+                .put("fileStores", FileStores.get())
+            )
+        );
+      } else {
         System.out.println("broke");
         break;
       }
-
-      protocol.send(new JSONObject()
-          .put("type", 0)
-          .put("content", new JSONObject()
-              .put("processor", Processor.get())
-              .put("memory", Memory.get())
-              .put("fileStores", FileStores.get())
-          )
-      );
     }
   }
 
   public void start() throws IOException {
-    if(!loggedIn) {
+    if (!loggedIn) {
       throw new IllegalStateException("You must sign in first!");
     }
 
     loop();
-  }
-
-  public static void main(String[] args) {
-    try (
-        var socket = new Socket("localhost", 9000);
-        var protocol = new Protocol(socket)
-    ) {
-      var loginRequest = new JSONObject();
-
-      loginRequest.put("type", 100);
-
-      var content = new JSONObject();
-      content.put("username", "a");
-      content.put("password", "a");
-
-      loginRequest.put("content", content);
-
-      protocol.send(loginRequest);
-
-      var loginResponse = protocol.receive();
-
-      if (loginResponse.getInt("type") == 0) {
-        System.out.println("logged in");
-
-        var sys = new SystemInfo();
-        var hardware = sys.getHardware();
-        var cpu = hardware.getProcessor();
-        var mem = hardware.getMemory();
-
-        while (true) {
-          var serverRequest = protocol.receive();  // PARSE PARAMETERS FROM HERE
-
-          var data = new JSONObject();
-
-          data.put("type", 0);  // not 0 means something wen't wrong
-
-          content = new JSONObject();
-
-          content.put("cpuLoad", String.format("%.1f%%", cpu.getSystemCpuLoad() * 100));
-          content.put("memory", String.format("%.1f%% (%s/%s)",
-              (double) (mem.getTotal() - mem.getAvailable()) * 100 / (double) mem.getTotal(),
-              FormatUtil.formatBytes(mem.getTotal() - mem.getAvailable()),
-              FormatUtil.formatBytes(mem.getTotal())
-          ));
-
-          data.put("content", content);
-
-          protocol.send(data);
-        }
-      }
-    } catch (IOException e) {  // fix this later
-      e.printStackTrace();
-      System.exit(0);
-    }
   }
 
   @Override

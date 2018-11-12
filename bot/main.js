@@ -6,7 +6,8 @@ const Discord = require('discord.js');
 
 const Protocol = require('./protocol/protocol');
 const RequestHandler = require('./request_handler');
-const messages = require('./protocol/messages');
+
+const token = require('./secrets/token');
 
 const client = new Discord.Client();
 
@@ -22,21 +23,23 @@ client.on('ready', () => {
           RequestHandler.setupDiscordDm(this, client, content.tag);
           break;
 
+        case 1:  // send ping
+          RequestHandler.sendPing(this, client, content.id);
+          break;
+
         default:
           console.log('unknown message type');
 
           break;
       }
-
-      socket.end();
     }).init();
   });
 
-  server.listen(12000, 'localhost');
+  server.listen(10000, 'localhost');
 });
 
 client.on('message', msg => {
   //handle commands
 });
 
-client.login('NDg3MzE5NjM4ODIxMzA2MzY4.DnL7fA.GPd3LkdSO-NziLzKZ6fmVfQs4Yc').catch(console.log);
+client.login(token).catch(console.log);

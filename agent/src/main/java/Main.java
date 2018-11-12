@@ -10,6 +10,7 @@ public class Main {
       agent.start();
     } catch (IOException e) {
       e.printStackTrace();
+      System.exit(1);
     }
   }
 }

@@ -5,7 +5,6 @@ const net = require('net');
 const Protocol = require('./protocol/protocol');
 const AgentHandler = require('./agent_handler');
 const WebappHandler = require('./webapp_handler');
-// const messages = require('./protocol/messages');
 const models = require('./sql/models');
 
 const agentListener = new net.Server();
@@ -20,11 +19,20 @@ models.sequelize.sync({force: false}).then(() => {
   agentListener.on('connection', agent => {
     console.log('New Agent connection');
 
-    new Protocol(agent, async function (message) {
+    agent.on('error', () => {
+      const index = agents.findIndex(e => e.socket === agent);
+      if (index !== -1) {
+        agents.splice(index, 1);
+      }
+    });
+
+    new Protocol(agent, async function(message) {
       const content = message.content;
-      switch (message.type){
-        case 0:  // simple auth
-          AgentHandler.authenticateUser(this, content.username, content.password, agents, agent);
+      switch (message.type) {
+        case 0:  // auth
+          AgentHandler.authenticateUser(
+            this, content.username, content.password, content.agentId, content.agentName, agents, agent
+          );
           break;
 
         default:
@@ -39,7 +47,7 @@ models.sequelize.sync({force: false}).then(() => {
   webappListener.on('connection', socket => {
     console.log('New WebApp connection');
 
-    new Protocol(socket, async function (message) {
+    new Protocol(socket, async function(message) {
       const content = message.content;
       switch (message.type) {
         case 0:  // auth webapp
@@ -51,11 +59,31 @@ models.sequelize.sync({force: false}).then(() => {
           break;
 
         case 2:  // get data
-          WebappHandler.queryLastData(this, content.userId, agents);
+          WebappHandler.queryLastData(this, content.userId, content.agentId, agents);
           break;
 
         case 3:  // setup alerts via DM
           WebappHandler.setupDiscordDm(this, content.userId, content.userTag);
+          break;
+
+        case 4:  // get agents
+          WebappHandler.getAgents(this, content.userId, agents);
+          break;
+
+        case 5:  // get agents
+          WebappHandler.getAgent(this, content.userId, content.agentId);
+          break;
+
+        case 6:  // send ping
+          WebappHandler.sendPing(this, content.userId);
+          break;
+
+        case 7:
+          WebappHandler.changeAgentParams(this, content.agentParams, content.userId, agents);
+          break;
+
+        case 8:
+          WebappHandler.removeAgent(this, content.userId, content.agentId, agents);
           break;
 
         default:
@@ -70,7 +98,7 @@ models.sequelize.sync({force: false}).then(() => {
   botListener.on('connnection', socket => {
     console.log('New Bot connection');
 
-    new Protocol(socket, async function (message) {
+    new Protocol(socket, async function(message) {
       const content = message.content;
       switch (message.type) {
         default:
@@ -82,3 +110,5 @@ models.sequelize.sync({force: false}).then(() => {
 
   botListener.listen(9002, 'localhost');
 });
+
+module.exports = agents;  // for testing purposes

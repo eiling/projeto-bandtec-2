@@ -28,32 +28,51 @@
           if (obj.status === 0) {
             document.getElementById('status').innerText = '0';
 
-            const content = obj.content;
+            const data = obj.content.data;
+            const alerts = obj.content.alerts;
 
-            document.getElementById('date').innerText = content.dateTime;
+            document.getElementById('date').innerText = data.dateTime;
 
-            if (content.processor) {
+            if (data.processor) {
               document.getElementById('processor').innerText =
-                  'Name: ' + content.processor.name +
-                  '\nLoad percentage: ' + parseFloat(content.processor.systemCpuLoad * 100).toFixed(1) + '%';
+                  'Name: ' + data.processor.name +
+                  '\nLoad percentage: ' + parseFloat(data.processor.systemCpuLoad * 100).toFixed(1) + '%';
+              if (alerts.cpu) {
+                document.getElementById('processor').style.color = 'red';
+              } else {
+                document.getElementById('processor').style.color = 'black';
+              }
             }
-            if (content.memory) {
-              let a = content.memory.available;
-              let t = content.memory.total;
+            if (data.memory) {
+              let a = data.memory.available;
+              let t = data.memory.total;
               document.getElementById('memory').innerText =
                   'Used percentage: ' + parseFloat(100 - (a * 100 / t)).toFixed(1) + '%' +
                   '\nAvailable: ' + formatBytes(a) +
                   '\nTotal: ' + formatBytes(t);
+              if (alerts.memory) {
+                document.getElementById('memory').style.color = 'red';
+              } else {
+                document.getElementById('memory').style.color = 'black';
+              }
             }
-            if (content.fileStores) {
+            if (data.fileStores) {
               const div = document.getElementById('file-stores');
               div.innerText = '';
-              for (let f of content.fileStores) {
-                div.innerText +=
+              for (let f of data.fileStores) {
+                const p = document.createElement('p');
+
+                p.innerText +=
                     'Mount point: ' + f.mount +
                     '\nUsed percentage: ' + parseFloat(100 - (f.usableSpace * 100 / f.totalSpace)).toFixed(1) + '%' +
                     '\nUsable: ' + formatBytes(f.usableSpace) +
                     '\nTotal: ' + formatBytes(f.totalSpace) + '\n\n';
+
+                if ((f.mount === 'C:\\' || f.mount === '/') && alerts.disk) {
+                  p.style.color = 'red';
+                }
+
+                div.appendChild(p);
               }
             }
           } else {

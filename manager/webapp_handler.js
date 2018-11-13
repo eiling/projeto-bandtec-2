@@ -61,7 +61,7 @@ function queryLastData(protocol, userId, agentId, agents) {
       if (agent) {
         protocol.send({
           type: 0,
-          content: agent.getLast(),
+          content: agent.get(),
         });
       } else {
         protocol.send({

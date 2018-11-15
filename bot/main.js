@@ -27,6 +27,10 @@ client.on('ready', () => {
           RequestHandler.sendPing(this, client, content.id);
           break;
 
+        case 2:
+          RequestHandler.sendAlert(this, client, content.id, content.alertContent);
+          break;
+
         default:
           console.log('unknown message type');
 

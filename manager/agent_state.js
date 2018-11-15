@@ -1,8 +1,9 @@
 'use strict';
 
 const Protocol = require('./protocol/protocol');
+const Util = require('./util');
 
-function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMemory, agentDisk, socket) {
+function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMemory, agentDisk, discordId, socket) {
   socket._events.data = undefined;
   socket._events.served = undefined;
 
@@ -14,6 +15,8 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
   this.memory = agentMemory;
   this.disk = agentDisk;
 
+  this.discordId = discordId;
+
   this.cpuAlertState_ = {};
   this.memoryAlertState_ = {};
   this.diskAlertState_ = {};
@@ -21,36 +24,59 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
   this.socket = socket;
   this.dataQueue = [];
   this.protocol = new Protocol(this.socket, async message => {
-    const start = Date.now();
+    const now = Date.now();
 
     if (message.type === 0) {
       // store date/time from data
       let data = message.content;
-      data.dateTime = new Date().toISOString();
+      data.timestamp = now;
 
-      this.dataQueue.push(message.content);
+      this.dataQueue.push(data);
       while (this.dataQueue.length > 1) {  // remove old data
         this.dataQueue.shift();
       }
 
-      //handle alerts
+      //handle alerts  --  THIS COULD BE BETTER
       if (this.cpu <= 0 && this.cpu >= -100) {
         if (data.processor.systemCpuLoad * 100 > -this.cpu) {
           if (!this.cpuAlertState_.alert) {
             // send message
+            // Util.sendToBot({
+            //   type: 2,
+            //   content: {
+            //     id: this.discordId,
+            //     alertContent: {
+            //       name: this.name,
+            //       resource: 'CPU',
+            //       threshold: this.cpu,
+            //       timestamp: now,
+            //     },
+            //   },
+            // }, response => {
+            //   console.log(response);  // handle errors
+            // });
+            Util.sendAlertToBot(this.userId, {
+              name: this.name,
+              resource: 'CPU',
+              threshold: this.cpu,
+              timestamp: now,
+            }, response => {
+              console.log(response);  // handle error when sending message
+            });
+
             this.cpuAlertState_.alert = true;
-            this.cpuAlertState_.beginTime = data.dateTime;
+            this.cpuAlertState_.beginTime = new Date(now).toISOString();
           }
         } else {
           if (this.cpuAlertState_.alert) {
-            this.cpuAlertState_.endTime = data.dateTime;
+            this.cpuAlertState_.endTime = new Date(now).toISOString();
             // save to database
 
             this.cpuAlertState_ = {};
           }
         }
       } else if (this.cpuAlertState_.alert) {
-        this.cpuAlertState_.endTime = data.dateTime;
+        this.cpuAlertState_.endTime = new Date(now).toISOString();
         // save to database
 
         this.cpuAlertState_ = {};
@@ -60,11 +86,11 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
           if (!this.memoryAlertState_.alert) {
             // send message
             this.memoryAlertState_.alert = true;
-            this.memoryAlertState_.beginTime = data.dateTime;
+            this.memoryAlertState_.beginTime = new Date(now).toISOString();
           }
         } else {
           if (this.memoryAlertState_.alert) {
-            this.memoryAlertState_.endTime = data.dateTime;
+            this.memoryAlertState_.endTime = new Date(now).toISOString();
             // save to database
 
             this.memoryAlertState_ = {};
@@ -75,18 +101,18 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
           if (!this.memoryAlertState_.alert) {
             // send message
             this.memoryAlertState_.alert = true;
-            this.memoryAlertState_.beginTime = data.dateTime;
+            this.memoryAlertState_.beginTime = new Date(now).toISOString();
           }
         } else {
           if (this.memoryAlertState_.alert) {
-            this.memoryAlertState_.endTime = data.dateTime;
+            this.memoryAlertState_.endTime = new Date(now).toISOString();
             // save to database
 
             this.memoryAlertState_ = {};
           }
         }
       } else if (this.memoryAlertState_.alert) {
-        this.memoryAlertState_.endTime = data.dateTime;
+        this.memoryAlertState_.endTime = new Date(now).toISOString();
         // save to database
 
         this.memoryAlertState_ = {};
@@ -99,11 +125,11 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
             if (!this.diskAlertState_.alert) {
               // send message
               this.diskAlertState_.alert = true;
-              this.diskAlertState_.beginTime = data.dateTime;
+              this.diskAlertState_.beginTime = new Date(now).toISOString();
             }
           } else {
             if (this.diskAlertState_.alert) {
-              this.diskAlertState_.endTime = data.dateTime;
+              this.diskAlertState_.endTime = new Date(now).toISOString();
               // save to database
 
               this.diskAlertState_ = {};
@@ -114,18 +140,18 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
             if (!this.diskAlertState_.alert) {
               // send message
               this.diskAlertState_.alert = true;
-              this.diskAlertState_.beginTime = data.dateTime;
+              this.diskAlertState_.beginTime = new Date(now).toISOString();
             }
           } else {
             if (this.diskAlertState_.alert) {
-              this.diskAlertState_.endTime = data.dateTime;
+              this.diskAlertState_.endTime = new Date(now).toISOString();
               // save to database
 
               this.diskAlertState_ = {};
             }
           }
         } else if (this.diskAlertState_.alert) {
-          this.diskAlertState_.endTime = data.dateTime;
+          this.diskAlertState_.endTime = new Date(now).toISOString();
           // save to database
 
           this.diskAlertState_ = {};
@@ -149,7 +175,7 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
 
       setTimeout(
         () => this.protocol.send({type: 0, content: {resources: resources,},}),
-        this.interval - Date.now() + start
+        this.interval - Date.now() + now
       );
     }
   }).init();

@@ -22,8 +22,17 @@ function authenticateUser(protocol, username, password, agentId, agentName, agen
           });
 
           agents.push(
-            new AgentState(user.id, agent.id, agent.name, agent.interval, agent.cpu, agent.memory, agent.disk, socket)
-              .start()
+            new AgentState(
+              user.id,
+              agent.id,
+              agent.name,
+              agent.interval,
+              agent.cpu,
+              agent.memory,
+              agent.disk,
+              user.discordId,
+              socket
+            ).start()
           );
         } else {  // agent not found
           models.Agent.build({
@@ -42,8 +51,17 @@ function authenticateUser(protocol, username, password, agentId, agentName, agen
             });
 
             agents.push(
-              new AgentState(user.id, agent.id, agent.name, agent.interval, agent.cpu, agent.memory, agent.disk, socket)
-                .start()
+              new AgentState(
+                user.id,
+                agent.id,
+                agent.name,
+                agent.interval,
+                agent.cpu,
+                agent.memory,
+                agent.disk,
+                user.discordId,
+                socket
+              ).start()
             );
           });
         }

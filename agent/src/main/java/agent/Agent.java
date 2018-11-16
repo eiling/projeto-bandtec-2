@@ -70,10 +70,14 @@ public class Agent implements AutoCloseable {
       loggedIn = true;
       setId(response.getJSONObject("content").getInt("id"));
 
-      return null;
+      return "You're in";
     } else {
       return response.getJSONObject("content").getString("message");
     }
+  }
+
+  public boolean isLoggedIn(){
+    return loggedIn;
   }
 
   private void loop() throws IOException {

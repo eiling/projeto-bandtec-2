@@ -40,8 +40,19 @@ function sendAlertToBot(userId, alertContent, handler) {
   })
 }
 
+function saveAlert(type, threshold, beginTime, endTime, agentId){
+  models.Alert.build({
+    type: type,
+    threshold: threshold,
+    beginTime: beginTime,
+    endTime: endTime,
+    agentId: agentId,
+  }).save().then(console.log).catch(console.log);  // handle errors
+}
+
 module.exports = {
   authenticate,
   sendToBot,
   sendAlertToBot,
+  saveAlert,
 };

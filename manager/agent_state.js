@@ -1,8 +1,12 @@
 'use strict';
 
 const Protocol = require('./protocol/protocol');
+const Util = require('./util');
+const models = require('./sql/models');
 
-function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMemory, agentDisk, socket) {
+const SAMPLE_SIZE = 10;
+
+function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMemory, agentDisk, discordId, socket) {
   socket._events.data = undefined;
   socket._events.served = undefined;
 
@@ -14,6 +18,8 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
   this.memory = agentMemory;
   this.disk = agentDisk;
 
+  this.discordId = discordId;
+
   this.cpuAlertState_ = {};
   this.memoryAlertState_ = {};
   this.diskAlertState_ = {};
@@ -21,51 +27,166 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
   this.socket = socket;
   this.dataQueue = [];
   this.protocol = new Protocol(this.socket, async message => {
-    const start = Date.now();
+    const now = Date.now();
 
     if (message.type === 0) {
       // store date/time from data
-      let data = message.content;
-      data.dateTime = new Date().toISOString();
+      const data = message.content;
+      data.timestamp = now;
 
-      this.dataQueue.push(message.content);
-      while (this.dataQueue.length > 1) {  // remove old data
-        this.dataQueue.shift();
+      this.dataQueue.push(data);
+
+      const dateIsoString = new Date(now).toISOString();
+
+      if (this.dataQueue.length > SAMPLE_SIZE) {  // store old data | what to do when connection is slow?
+        const tempData = this.dataQueue.slice(0, SAMPLE_SIZE);
+        this.dataQueue.splice(0, SAMPLE_SIZE);
+
+        // test sample
+        let processorPassed = true;
+        let memoryPassed = true;
+        let fileStoresPassed = true;
+
+        tempData.forEach(e => {
+          if(e.processor === undefined){
+            processorPassed = false;
+          }
+          if(e.memory === undefined){
+            memoryPassed = false;
+          }
+          if(e.fileStores === undefined){
+            fileStoresPassed = false;
+          }
+        });
+
+        // define objects
+        const resources = {};
+        if(processorPassed){
+          resources.processor = {
+            systemCpuLoad: 0,
+            datetime: dateIsoString,
+            agentId: this.agentId,
+          };
+        }
+        if(memoryPassed){
+          resources.memory = {
+            available: 0,
+            total: tempData[0].memory.total,
+            datetime: dateIsoString,
+            agentId: this.agentId,
+          };
+        }
+        if(fileStoresPassed){
+          resources.fileStores = [];
+          tempData[0].fileStores.forEach(e => {
+            resources.fileStores.push({
+              mount: e.mount,
+              usableSpace: 0,
+              totalSpace: e.totalSpace,
+              datetime: dateIsoString,
+              agentId: this.agentId,
+            });
+          });
+        }
+
+        // calculate averages
+        tempData.forEach(e => {
+          if (processorPassed) {
+            resources.processor.systemCpuLoad += e.processor.systemCpuLoad;
+          }
+          if (memoryPassed) {
+            resources.memory.available += e.memory.available;
+          }
+          if (fileStoresPassed) {
+            const l = resources.fileStores.length;
+            for (let i = 0; i < l; i++){
+              resources.fileStores[i].usableSpace += e.fileStores[i].usableSpace;
+            }
+          }
+        });
+
+        if(processorPassed){
+          resources.processor.systemCpuLoad /= SAMPLE_SIZE;
+        }
+        if(memoryPassed){
+          resources.memory.available /= SAMPLE_SIZE;
+        }
+        if(fileStoresPassed){
+          resources.fileStores.forEach(e => e.usableSpace /= SAMPLE_SIZE);
+        }
+
+        // store objects  -- handle errors properly
+        if (processorPassed) {
+          models.ProcessorData.build(resources.processor).save()
+              .then(() => {console.log('saved processorData')})
+              .catch(() => {console.error('error saving processorData')});
+        }
+        if (memoryPassed) {
+          models.MemoryData.build(resources.memory).save()
+              .then(() => {console.log('saved memoryData')})
+              .catch(() => {console.error('error saving memoryData')});
+        }
+        if (fileStoresPassed) {
+          resources.fileStores.forEach(e => models.FileStoreData.build(e).save()
+              .then(() => {console.log('saved fileStoreData')})
+              .catch(() => {console.error('error saving fileStoreData')}));
+        }
       }
 
-      //handle alerts
+      //handle alerts  --  THIS COULD BE BETTER
       if (this.cpu <= 0 && this.cpu >= -100) {
         if (data.processor.systemCpuLoad * 100 > -this.cpu) {
           if (!this.cpuAlertState_.alert) {
-            // send message
+            Util.sendAlertToBot(this.userId, {
+              name: this.name,
+              resource: 'CPU',
+              threshold: this.cpu,
+              timestamp: now,
+            }, response => {
+              console.log(response);  // handle error when sending message
+            });
+
             this.cpuAlertState_.alert = true;
-            this.cpuAlertState_.beginTime = data.dateTime;
+            this.cpuAlertState_.threshold = this.cpu;
+            this.cpuAlertState_.time = new Date(now).toISOString();
           }
         } else {
           if (this.cpuAlertState_.alert) {
-            this.cpuAlertState_.endTime = data.dateTime;
-            // save to database
+            Util.saveAlert('CPU', this.cpuAlertState_.threshold,
+                this.cpuAlertState_.time, new Date(now).toISOString(),
+                this.agentId);
 
             this.cpuAlertState_ = {};
           }
         }
       } else if (this.cpuAlertState_.alert) {
-        this.cpuAlertState_.endTime = data.dateTime;
-        // save to database
+        Util.saveAlert('CPU', this.cpuAlertState_.threshold,
+            this.cpuAlertState_.time, new Date(now).toISOString(),
+            this.agentId);
 
         this.cpuAlertState_ = {};
       }
       if (this.memory <= 0 && this.memory >= -100) {
         if (100 - data.memory.available * 100 / data.memory.total > -this.memory) {
           if (!this.memoryAlertState_.alert) {
-            // send message
+            Util.sendAlertToBot(this.userId, {
+              name: this.name,
+              resource: 'memória',
+              threshold: this.memory,
+              timestamp: now,
+            }, response => {
+              console.log(response);  // handle error when sending message
+            });
+
             this.memoryAlertState_.alert = true;
-            this.memoryAlertState_.beginTime = data.dateTime;
+            this.memoryAlertState_.threshold = this.memory;
+            this.memoryAlertState_.time = new Date(now).toISOString();
           }
         } else {
           if (this.memoryAlertState_.alert) {
-            this.memoryAlertState_.endTime = data.dateTime;
-            // save to database
+            Util.saveAlert('MEMORY', this.memoryAlertState_.threshold,
+                this.memoryAlertState_.time, new Date(now).toISOString(),
+                this.agentId);
 
             this.memoryAlertState_ = {};
           }
@@ -73,21 +194,32 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
       } else if (this.memory > 0) {
         if (data.memory.available < this.memory) {
           if (!this.memoryAlertState_.alert) {
-            // send message
+            Util.sendAlertToBot(this.userId, {
+              name: this.name,
+              resource: 'memória',
+              threshold: this.memory,
+              timestamp: now,
+            }, response => {
+              console.log(response);  // handle error when sending message
+            });
+
             this.memoryAlertState_.alert = true;
-            this.memoryAlertState_.beginTime = data.dateTime;
+            this.memoryAlertState_.threshold = this.memory;
+            this.memoryAlertState_.time = new Date(now).toISOString();
           }
         } else {
           if (this.memoryAlertState_.alert) {
-            this.memoryAlertState_.endTime = data.dateTime;
-            // save to database
+            Util.saveAlert('MEMORY', this.memoryAlertState_.threshold,
+                this.memoryAlertState_.time, new Date(now).toISOString(),
+                this.agentId);
 
             this.memoryAlertState_ = {};
           }
         }
       } else if (this.memoryAlertState_.alert) {
-        this.memoryAlertState_.endTime = data.dateTime;
-        // save to database
+        Util.saveAlert('MEMORY', this.memoryAlertState_.threshold,
+            this.memoryAlertState_.time, new Date(now).toISOString(),
+            this.agentId);
 
         this.memoryAlertState_ = {};
       }
@@ -97,14 +229,24 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
         if (this.disk <= 0 && this.disk >= -100) {
           if (100 - i.usableSpace * 100 / i.totalSpace > -this.disk) {
             if (!this.diskAlertState_.alert) {
-              // send message
+              Util.sendAlertToBot(this.userId, {
+                name: this.name,
+                resource: 'partição de disco primária',
+                threshold: this.disk,
+                timestamp: now,
+              }, response => {
+                console.log(response);  // handle error when sending message
+              });
+
               this.diskAlertState_.alert = true;
-              this.diskAlertState_.beginTime = data.dateTime;
+              this.diskAlertState_.threshold = this.disk;
+              this.diskAlertState_.time = new Date(now).toISOString();
             }
           } else {
             if (this.diskAlertState_.alert) {
-              this.diskAlertState_.endTime = data.dateTime;
-              // save to database
+              Util.saveAlert('DISK', this.diskAlertState_.threshold,
+                  this.diskAlertState_.time, new Date(now).toISOString(),
+                  this.agentId);
 
               this.diskAlertState_ = {};
             }
@@ -112,27 +254,36 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
         } else if (this.disk > 0) {
           if (i.usableSpace < this.disk) {
             if (!this.diskAlertState_.alert) {
-              // send message
+              Util.sendAlertToBot(this.userId, {
+                name: this.name,
+                resource: 'partição de disco primária',
+                threshold: this.disk,
+                timestamp: now,
+              }, response => {
+                console.log(response);  // handle error when sending message
+              });
+
               this.diskAlertState_.alert = true;
-              this.diskAlertState_.beginTime = data.dateTime;
+              this.diskAlertState_.threshold = this.disk;
+              this.diskAlertState_.time = new Date(now).toISOString();
             }
           } else {
             if (this.diskAlertState_.alert) {
-              this.diskAlertState_.endTime = data.dateTime;
-              // save to database
+              Util.saveAlert('DISK', this.diskAlertState_.threshold,
+                  this.diskAlertState_.time, new Date(now).toISOString(),
+                  this.agentId);
 
               this.diskAlertState_ = {};
             }
           }
         } else if (this.diskAlertState_.alert) {
-          this.diskAlertState_.endTime = data.dateTime;
-          // save to database
+          Util.saveAlert('DISK', this.diskAlertState_.threshold,
+              this.diskAlertState_.time, new Date(now).toISOString(),
+              this.agentId);
 
           this.diskAlertState_ = {};
         }
       }
-
-      //handle persistence (in a promise)
 
       // request again
       const resources = [];
@@ -148,14 +299,14 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
       }
 
       setTimeout(
-        () => this.protocol.send({type: 0, content: {resources: resources,},}),
-        this.interval - Date.now() + start
+          () => this.protocol.send({type: 0, content: {resources: resources,},}),
+          this.interval - Date.now() + now  // check if this is less than zero -> server is lagging
       );
     }
   }).init();
 }
 
-AgentState.prototype.start = function() {
+AgentState.prototype.start = function () {
   const resources = [];
 
   if (this.cpu !== -102) {
@@ -174,7 +325,7 @@ AgentState.prototype.start = function() {
   return this;
 };
 
-AgentState.prototype.get = function() {
+AgentState.prototype.get = function () {  // can we have a race condition here?
   const len = this.dataQueue.length;
   if (len === 0) {
     return {};
@@ -192,7 +343,7 @@ AgentState.prototype.get = function() {
   };
 };
 
-AgentState.prototype.stop = function() {
+AgentState.prototype.stop = function () {
   setImmediate(() => this.protocol.send({type: 1, content: {},}));
 };
 

@@ -42,6 +42,8 @@
               } else {
                 document.getElementById('processor').style.color = 'black';
               }
+            } else {
+              document.getElementById('processor').innerText = '';
             }
             if (data.memory) {
               let a = data.memory.available;
@@ -55,6 +57,8 @@
               } else {
                 document.getElementById('memory').style.color = 'black';
               }
+            } else {
+              document.getElementById('memory').innerText = '';
             }
             if (data.fileStores) {
               const div = document.getElementById('file-stores');
@@ -74,6 +78,8 @@
 
                 div.appendChild(p);
               }
+            } else {
+              document.getElementById('file-stores').innerText = '';
             }
           } else {
             document.getElementById('status').innerText = obj.status;

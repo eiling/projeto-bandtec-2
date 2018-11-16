@@ -84,40 +84,32 @@ function queryLastData(protocol, userId, agentId, agents) {
 
 function setupDiscordDm(protocol, userId, userTag) {
   models.User.findById(userId).then(user => {
-    const botSocket = new net.Socket();
-    botSocket.connect(10000, 'localhost', () => {
-      new Protocol(botSocket, response => {
-        if (response.type === 0) {
-          user.discordId = response.content.discordId;
-          user.save().then(() => {
-            protocol.send({
-              type: 0,
-              content: {
-                discordId: response.content.discordId,
-              },
-            });
-            console.log('SAVED');
-          }).catch(reason => {
-            protocol.send({
-              type: 1,
-              content: {
-                message: 'Error in setupDiscordDm() [MANAGER] - ' + reason.name,
-              },
-            });
-            console.log('ERROR - ' + reason.name);
+    Util.sendToBot({
+      type: 0,
+      content: {
+        tag: userTag,
+      },
+    }, response => {
+      if (response.type === 0) {
+        user.discordId = response.content.discordId;
+        user.save().then(() => {
+          protocol.send({
+            type: 0,
+            content: {
+              discordId: response.content.discordId,
+            },
           });
-        } else {
-          protocol.send(response);  // change this later
-          console.log('ERROR');
-        }
-
-        botSocket.end();
-      }).init().send({
-        type: 0,
-        content: {
-          tag: userTag,
-        },
-      });
+        }).catch(reason => {
+          protocol.send({
+            type: 1,
+            content: {
+              message: 'Error in setupDiscordDm() [MANAGER] - ' + reason.name,
+            },
+          });
+        });
+      } else {
+        protocol.send(response);  // change this later
+      }
     });
   });
 }
@@ -184,18 +176,13 @@ function sendPing(protocol, userId) {
   models.User.findById(userId).then(user => {
     if (user) {
       if (user.discordId) {
-        const socket = new net.Socket();
-        socket.connect(10000, 'localhost', () => {
-          new Protocol(socket, response => {
-            protocol.send(response);
-
-            socket.end();
-          }).init().send({
-            type: 1,
-            content: {
-              id: user.discordId,
-            },
-          });
+        Util.sendToBot({
+          type: 1,
+          content: {
+            id: user.discordId,
+          },
+        }, response => {
+          protocol.send(response);
         });
       } else {
         protocol.send({

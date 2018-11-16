@@ -25,7 +25,6 @@ public class FileStores {
           .put("mount", fileStore.getMount())
           .put("usableSpace", fileStore.getUsableSpace())
           .put("totalSpace", fileStore.getTotalSpace())
-          .put("description", fileStore.getDescription())
       );
     }
 

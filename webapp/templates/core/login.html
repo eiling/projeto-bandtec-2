@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% load static %}
+<meta charset="utf-8">
+<title>EAGLE</title>
+<link rel="stylesheet" href="{% static 'core/css/material.min.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/login.css' %}">
+<link rel="shortcut icon" href="{% static 'core/images/eagle-emblem_38348.png' %}">
+
+<div class="center">
+  <form id="login-form">
+    {% csrf_token %}
+    <div class="mdl-textfield mdl-js-textfield">
+      <input class="mdl-textfield__input no-outline" type="text" id="username-field" name="username">
+      <label class="mdl-textfield__label" for="username-field">Usuário</label>
+    </div>
+    <br>
+    <div class="mdl-textfield mdl-js-textfield">
+      <input class="mdl-textfield__input no-outline" type="password" id="password-field" name="password">
+      <label class="mdl-textfield__label" for="password-field">Senha</label>
+    </div>
+    <br>
+    <a href="/signup" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" id="signup-button">
+      CADASTRE-SE
+    </a>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" id="signin-button">
+      ENTRAR
+    </button>
+  </form>
+</div>
+
+<script src="{% static 'core/js/material.min.js' %}"></script>
+<script src="{% static 'core/js/login.js' %}"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

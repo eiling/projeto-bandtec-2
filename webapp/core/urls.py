@@ -19,4 +19,6 @@ urlpatterns = [
     path('ajax/ping', ajax.ping),
     path('ajax/change_agent', ajax.change_agent),
     path('ajax/remove_agent', ajax.remove_agent),
+
+    path('test', views.test),
 ]

@@ -7,7 +7,7 @@ def index(request):
     if 'user_id' in request.session.keys():
         return redirect('/main_page')
 
-    return render(request, 'core/index.html')
+    return render(request, 'core/login.html')
 
 
 def signup(request):
@@ -58,3 +58,7 @@ def logout(request):
     request.session.flush()
 
     return redirect('/')
+
+
+def test(request):
+    return render(request, 'core/test.html')

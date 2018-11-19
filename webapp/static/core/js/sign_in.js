@@ -1,3 +1,6 @@
+let handlingRequest = false;
+let requestDone = false;
+
 $(function () {
   $('#sign-in-form').validate({
     highlight: function (input) {
@@ -11,9 +14,22 @@ $(function () {
       $(element).parents('.input-group').append(error);
     },
     submitHandler: function (form) {
+      if (handlingRequest) {
+        return;
+      }
+      handlingRequest = true;
+
+      const submitButton = document.getElementById('submit-button');
+      submitButton.disabled = true;
+
       const req = new XMLHttpRequest();
       req.onreadystatechange = () => {
         if (req.readyState === 4 && req.status === 200) {
+          if (requestDone) {
+            return;
+          }
+          requestDone = true;
+
           const obj = JSON.parse(req.responseText);
 
           if (obj.status === 0) {
@@ -25,6 +41,10 @@ $(function () {
             form.reset();
             document.getElementById('username-field').focus();
           }
+
+          submitButton.disabled = false;
+          handlingRequest = false;
+          requestDone = false;
         }
       };
 

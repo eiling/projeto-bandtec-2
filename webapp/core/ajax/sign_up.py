@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from util.protocol import get_manager_response
 
 
-def signup(request):
+def sign_up(request):
     if request.method != 'POST':
         return HttpResponse('Wrong request method. Use POST.', content_type='text/plain')
 

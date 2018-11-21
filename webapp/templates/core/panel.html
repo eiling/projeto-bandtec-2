@@ -27,6 +27,9 @@
   <!-- Animation Css -->
   <link href="{% static 'adminbsb/plugins/animate-css/animate.css' %}" rel="stylesheet"/>
 
+  <!-- Real Time Css -->
+  <link href="{% static 'core/css/realtime.css' %}" rel="stylesheet"/>
+
   <!-- Custom Css -->
   <link href="{% static 'adminbsb/css/style.css' %}" rel="stylesheet">
 
@@ -133,13 +136,36 @@
             </select>
           </div>
         </div>
+        <div class="card">
+          <div class="body">
+            <div class="demo-container">
+              <div id="placeholder1" class="demo-placeholder"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="body">
+            <div class="demo-container">
+              <div id="placeholder2" class="demo-placeholder"></div>
+            </div>
+          </div>
+        </div>
+      <div>
+
+        </div>
       </div>
     </div>
   </div>
 </section>
-
+</body>
 <!-- Jquery Core Js -->
 <script src="{% static 'adminbsb/plugins/jquery/jquery.min.js' %}"></script>
+
+<!-- Jquery Js -->
+<script src="{% static 'adminbsb/plugins/jquery/jquery.js' %}"></script>
+
+<!-- Jquery Flot Js -->
+<script src="{% static 'core/js/jquery.flot.js' %}"></script>
 
 <!-- Bootstrap Core Js -->
 <script src="{% static 'adminbsb/plugins/bootstrap/js/bootstrap.js' %}"></script>
@@ -155,6 +181,101 @@
 
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
-</body>
+<script type="text/javascript">
+
+	$(function() {
+
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+
+		var datas = [[null,null],[null,null]],
+			totalPoints = 300;
+
+		function getRandomData(int) {
+		
+			if (datas[int].length > 0){
+				datas[int] = datas[int].slice(1);
+				
+			}
+				
+
+			// Do a random walk
+			
+			while (datas[int].length < totalPoints) {
+				
+				var prev = datas[int].length > 0 ? datas[int][datas[int].length - 1] : 50,
+					y = prev + Math.random() * 10 - 5;
+					
+				if (y < 0) {
+					y = 0;
+				} else if (y > 100) {
+					y = 100;
+				}
+				
+
+				datas[int].push(y);
+			}
+
+			// Zip the generated y values with the x values
+
+			var res = [];
+			for (var i = 0; i < datas[int].length; ++i) {
+				res.push([i, datas[int][i]])
+				
+			}
+
+			return res;
+		}
+
+		// Set up the control widget
+
+		var updateInterval = 500;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 2000) {
+					updateInterval = 2000;
+				}
+				$(this).val("" + updateInterval);
+			}
+		});
+		// python *
+		var plot1 = $.plot("#placeholder1", [ getRandomData(0) ], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: 0,
+				max: 100
+			},
+			xaxis: {
+				show: false
+			}
+		});
+		// python +
+		
+
+		function update() {
+			
+			plot1.setData([getRandomData(0)]);
+
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+			
+			plot1.draw();
+			
+			setTimeout(update, updateInterval);
+		}
+
+		update();
+
+		// Add the Flot version string to the footer
+
+
+	});
+
+	</script>
 
 </html>

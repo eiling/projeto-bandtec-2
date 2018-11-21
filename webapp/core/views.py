@@ -61,7 +61,7 @@ def logout(request):
 
 
 def test(request):
-    return render(request, 'core/sign-in.html')
+    return render(request, 'core/index.html')
 
 
 def ajax_test(request):
@@ -69,3 +69,7 @@ def ajax_test(request):
     if request.method != 'POST':
         return HttpResponse('Wrong request method. Use POST.', content_type='text/plain')
     return HttpResponse('{}', content_type='text/json')
+
+
+def panel(request):
+    return render(request, 'core/panel.html')

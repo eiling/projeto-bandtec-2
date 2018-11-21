@@ -10,6 +10,7 @@ urlpatterns = [
     path('details/<int:agent_id>', views.details),
     path('config/<int:agent_id>', views.agent_config),
 
+    path('panels',views.panel),
     path('logout', views.logout),
 
     path('ajax/sign_in', ajax.sign_in),

@@ -1,0 +1,32 @@
+.center {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+}
+
+.no-outline {
+    outline: none;
+}
+
+#signin-button {
+    display: block;
+    float: right;
+}
+
+#signup-button {
+    display: block;
+    float: left;
+}
+
+body {
+    background: #0f74a8;
+}
+
+.container {
+    background: white;
+    padding: 0 50px 50px;
+    border-radius: 10px;
+}

@@ -1,5 +1,5 @@
-from core.ajax.sign_in import *
-from core.ajax.sign_up import *
+from core.ajax.login import *
+from core.ajax.signup import *
 from core.ajax.setup_discord_dm import *
 from core.ajax.query_last_data import *
 from core.ajax.ping import *

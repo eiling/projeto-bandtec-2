@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
-import errno
+
 import os
 
 from secrets.secret_key import SECRET_KEY
@@ -93,12 +93,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
-
-try:
-    os.makedirs(os.path.join(BASE_DIR, 'sessiondata'))
-except OSError as e:
-    if e.errno != errno.EEXIST:
-        raise
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 SESSION_FILE_PATH = os.path.join(BASE_DIR, 'sessiondata')

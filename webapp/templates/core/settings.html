@@ -6,9 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <title>Welcome To | Bootstrap Based Admin Template - Material Design</title>
-  <!-- Favicon-->
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>Configurações - EAGLE</title>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet"
@@ -29,6 +27,8 @@
 
   <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
   <link href="{% static 'adminbsb/css/themes/theme-blue.css' %}" rel="stylesheet"/>
+
+  <link rel="shortcut icon" href="{% static 'core/images/eagle-emblem_38348.png' %}">
 </head>
 
 <body class="theme-blue">
@@ -117,7 +117,134 @@
 </section>
 
 <section class="content">
-  <!-- THINGS GO HERE -->
+  <div class="container-fluid">
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="header">
+            <h2>
+              Configurações de usuário
+              <small>Alterar dados da conta. Deixe em branco para não alterar.</small>
+            </h2>
+          </div>
+          <div class="body">
+            <form id="update-user-form">
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="text" id="name-field" name="name" class="form-control">
+                  <label class="form-label">Nome</label>
+                </div>
+              </div>
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="text" id="username-field" name="username" class="form-control">
+                  <label class="form-label">Usuário</label>
+                </div>
+              </div>
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="password" id="password-field" name="password" class="form-control">
+                  <label class="form-label">Senha</label>
+                </div>
+              </div>
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="password" id="confirm-password-field" name="confirm-password" class="form-control">
+                  <label class="form-label">Confirmar senha</label>
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary btn-lg m-t-15 waves-effect">SALVAR</button>
+              <button type="button" class="btn btn-primary btn-lg m-t-15 waves-effect">LIMPAR</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="header">
+            <h2>
+              Vínculo com Discord
+              <small>Cadastrar conta para alertas via mensagem direta.</small>
+            </h2>
+          </div>
+          <div class="body">
+            {% if discord_tag %}
+              <form id="remove-discord-form">
+                <div class="row clearfix">
+                  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                    <div class="form-group form-float" style="line-height: 37px">
+                      {{ discord_tag }}
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="pull-right">
+                      <button type="button" class="btn btn-primary btn-lg waves-effect">REMOVER</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            {% endif %}
+            <form id="update-discord-form" {% if discord_tag %}hidden{% endif %}>
+              <div class="row clearfix">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                  <div class="form-group form-float">
+                    <div class="form-line">
+                      <input type="text" class="form-control">
+                      <label class="form-label">Discord Tag</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                  <div class="pull-right">
+                    <button type="button" class="btn btn-primary btn-lg waves-effect">ADICIONAR</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="header">
+            <h2>
+              Agentes de monitoração
+              <small>Alterar configurações de agente.</small>
+            </h2>
+          </div>
+          <div class="body">
+            <div class="row clearfix">
+              {% if agents %}
+                {% for agent in agents %}
+                  {% if agent.connected %}
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                      <a href="/config/{{ agent.id }}" class="btn btn-block btn-lg btn-success waves-effect">
+                        {{ agent.name }} - CONECTADO
+                      </a>
+                    </div>
+                  {% else %}
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                      <a href="/config/{{ agent.id }}" class="btn btn-block btn-lg btn-danger waves-effect">
+                        {{ agent.name }} - DESCONECTADO
+                      </a>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  No agents to display.
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- Jquery Core Js -->
@@ -134,6 +261,10 @@
 
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
+
+<!-- update-user-form script -->
+{% if discord_tag %}<!-- remove-discord-form script -->{% endif %}
+<!-- update-discord-form script -->
 </body>
 
 </html>

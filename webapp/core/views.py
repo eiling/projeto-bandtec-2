@@ -61,7 +61,7 @@ def logout(request):
 
 
 def test(request):
-    return render(request, 'core/sign-in.html')
+    return render(request, 'core/settings.html')
 
 
 def ajax_test(request):

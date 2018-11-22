@@ -30,6 +30,25 @@ def main_page(request):
     return render(request, 'core/old/main_page.html', context)
 
 
+def settings(request):
+    if 'user_id' not in request.session.keys():
+        return redirect('/')
+
+    res = get_manager_response({'type': 4, 'content': {'userId': request.session['user_id']}})
+    agents = res['content']['agents']
+
+    context = {
+        'agents': agents,
+    }
+
+    res = get_manager_response({'type': 9, 'content': {'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['discord_tag'] = res['content']['discordTag']
+
+    return render(request, 'core/settings.html', context)
+
+
 def details(request, agent_id):
     if 'user_id' not in request.session.keys():
         return redirect('/')

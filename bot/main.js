@@ -31,6 +31,10 @@ client.on('ready', () => {
           RequestHandler.sendAlert(this, client, content.id, content.alertContent);
           break;
 
+        case 3:
+          RequestHandler.getDiscordTag(this, client, content.id);
+          break;
+
         default:
           console.log('unknown message type');
 

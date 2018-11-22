@@ -307,6 +307,42 @@ function removeAgent(protocol, userId, agentId, agents) {
   });
 }
 
+function getDiscordTag(protocol, userdId){
+  models.User.findById(userdId).then(user => {
+    if (user.discordId) {
+      Util.sendToBot({
+        type: 3,
+        content: {
+          id: user.discordId,
+        },
+      }, response => {
+        if (response.type === 0) {
+          protocol.send({
+            type: 0,
+            content: {
+              discordTag: response.content.discordTag,
+            },
+          });
+        } else {
+          protocol.send({
+            type: 1,
+            content: {
+              message: response.content.message,
+            },
+          });
+        }
+      });
+    } else {
+      protocol.send({
+        type: 2,
+        textContent: {
+          message: 'No Discord ID saved',
+        },
+      });
+    }
+  });
+}
+
 module.exports = {
   authenticateUser,
   signUp,
@@ -317,4 +353,5 @@ module.exports = {
   sendPing,
   changeAgentParams,
   removeAgent,
+  getDiscordTag,
 };

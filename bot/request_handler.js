@@ -71,8 +71,27 @@ function sendAlert(protocol, client, id, content){
   }));
 }
 
+function getDiscordTag(protocol, client, id){
+  client.fetchUser(id).then(user => {
+    protocol.send({
+      type: 0,
+      content: {
+        discordTag: user.tag,
+      },
+    });
+  }).catch(() => {
+    protocol.send({
+      type: 1,
+      content: {
+        message: 'Error fecthing user -- getDiscordTag()',
+      },
+    });
+  });
+}
+
 module.exports = {
   setupDiscordDm,
   sendPing,
   sendAlert,
+  getDiscordTag,
 };

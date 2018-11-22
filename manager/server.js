@@ -86,6 +86,22 @@ models.sequelize.sync({force: false}).then(() => {
           WebappHandler.removeAgent(this, content.userId, content.agentId, agents);
           break;
 
+        case 9:
+          WebappHandler.getDiscordTag(this, content.userId);
+          break;
+
+        case 10:
+          WebappHandler.removeDiscord(this, content.userId);
+          break;
+
+        case 11:
+          WebappHandler.getUser(this, content.userId);
+          break;
+
+        case 12:
+          WebappHandler.updateUser(this, content.userId, content.currentPassword, content.params);
+          break;
+
         default:
           console.log('unknown message type');
           break;

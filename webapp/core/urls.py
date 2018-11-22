@@ -6,8 +6,9 @@ from . import views, ajax
 urlpatterns = [
     path('', views.sign_in),
     path('sign_up', views.sign_up),
-    path('main_page', views.main_page),
-    path('details/<int:agent_id>', views.details),
+    path('main_page', views.main_page),  # change to panel
+    path('settings', views.settings),
+    path('details/<int:agent_id>', views.details), # remove later
     path('config/<int:agent_id>', views.agent_config),
 
     path('logout', views.logout),
@@ -19,6 +20,8 @@ urlpatterns = [
     path('ajax/ping', ajax.ping),
     path('ajax/change_agent', ajax.change_agent),
     path('ajax/remove_agent', ajax.remove_agent),
+    path('ajax/remove_discord', ajax.remove_discord),
+    path('ajax/update_user', ajax.update_user),
 
     path('test', views.test),
     path('ajax_test', views.ajax_test),

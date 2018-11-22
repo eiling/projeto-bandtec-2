@@ -307,6 +307,130 @@ function removeAgent(protocol, userId, agentId, agents) {
   });
 }
 
+function getDiscordTag(protocol, userdId) {
+  models.User.findById(userdId).then(user => {
+    if (user.discordId) {
+      Util.sendToBot({
+        type: 3,
+        content: {
+          id: user.discordId,
+        },
+      }, response => {
+        if (response.type === 0) {
+          protocol.send({
+            type: 0,
+            content: {
+              discordTag: response.content.discordTag,
+            },
+          });
+        } else {
+          protocol.send({
+            type: 1,
+            content: {
+              message: response.content.message,
+            },
+          });
+        }
+      });
+    } else {
+      protocol.send({
+        type: 2,
+        textContent: {
+          message: 'No Discord ID saved',
+        },
+      });
+    }
+  });
+}
+
+function removeDiscord(protocol, userId) {
+  models.User.findById(userId).then(user => {
+    user.discordId = null;
+    user.save().then(() => {
+      protocol.send({
+        type: 0,
+        content: {},
+      });
+    }).catch(err => {
+      protocol.send({
+        type: 1,
+        content: {
+          message: err.toString(),
+        },
+      });
+    });
+  }).catch(err => {
+    protocol.send({
+      type: 2,
+      content: {
+        message: err.toString(),
+      },
+    });
+  });
+}
+
+function getUser(protocol, userId) {
+  models.User.findById(userId).then(user => {
+    protocol.send({
+      type: 0,
+      content: {
+        user: user,
+      },
+    });
+  }).catch(err => {
+    protocol.send({
+      type: 1,
+      content: {
+        message: err.toString(),
+      },
+    });
+  })
+}
+
+function updateUser(protocol, userId, currentPassword, params) {
+  models.User.findById(userId).then(user => {
+    if (currentPassword === user.password) {
+      if (params.name) {
+        user.name = params.name;
+      }
+      if (params.username) {
+        user.username = params.username;
+      }
+      if (params.password) {
+        user.password = params.password;
+      }
+
+      user.save().then(() => {
+        protocol.send({
+          type: 0,
+          content: {},
+        });
+      }).catch(err => {
+        protocol.send({
+          type: 2,
+          content: {
+            message: err.toString(),
+          },
+        });
+      });
+    } else {
+      protocol.send({
+        type: 1,
+        content: {
+          message: 'Incorrect password',
+        },
+      });
+    }
+  }).catch(err => {
+    protocol.send({
+      type: 3,
+      content: {
+        message: err.toString(),
+      },
+    });
+  });
+}
+
 module.exports = {
   authenticateUser,
   signUp,
@@ -317,4 +441,8 @@ module.exports = {
   sendPing,
   changeAgentParams,
   removeAgent,
+  getDiscordTag,
+  removeDiscord,
+  getUser,
+  updateUser,
 };

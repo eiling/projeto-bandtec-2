@@ -56,6 +56,7 @@
 <nav class="navbar">
   <div class="container-fluid">
     <div class="navbar-header">
+      <a href="javascript:void(0);" class="bars"></a>
       <span class="navbar-brand" href="not_used/index.html">EAGLE</span>
     </div>
   </div>
@@ -67,7 +68,7 @@
     <!-- User Info -->
     <div class="user-info">
       <div class="info-container">
-        Olá, USER_NAME.
+        Olá, {{ name }}!
       </div>
     </div>
     <!-- #User Info -->
@@ -87,7 +88,7 @@
           </a>
         </li>
         <li class="active">
-          <a href="/">
+          <a href="/settings">
             <i class="material-icons">settings</i>
             <span>Configurações</span>
           </a>
@@ -129,6 +130,7 @@
           </div>
           <div class="body">
             <form id="update-user-form">
+              {% csrf_token %}
               <div class="form-group form-float">
                 <div class="form-line">
                   <input type="text" id="name-field" name="name" class="form-control">
@@ -153,8 +155,14 @@
                   <label class="form-label">Confirmar senha</label>
                 </div>
               </div>
-              <button type="button" class="btn btn-primary btn-lg m-t-15 waves-effect">SALVAR</button>
-              <button type="button" class="btn btn-primary btn-lg m-t-15 waves-effect">LIMPAR</button>
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="password" id="current-password-field" name="current-password" class="form-control">
+                  <label class="form-label">Senha atual</label>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-lg m-t-15 waves-effect" id="update-user-button">SALVAR</button>
+              <button type="reset" class="btn btn-primary btn-lg m-t-15 waves-effect">LIMPAR</button>
             </form>
           </div>
         </div>
@@ -170,35 +178,36 @@
             </h2>
           </div>
           <div class="body">
-            {% if discord_tag %}
-              <form id="remove-discord-form">
-                <div class="row clearfix">
-                  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
-                    <div class="form-group form-float" style="line-height: 37px">
-                      {{ discord_tag }}
-                    </div>
-                  </div>
-                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                    <div class="pull-right">
-                      <button type="button" class="btn btn-primary btn-lg waves-effect">REMOVER</button>
-                    </div>
+            <form id="remove-discord-form" {% if not discord_tag %}hidden{% endif %}>
+              {% csrf_token %}
+              <div class="row clearfix">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                  <div class="form-group form-float" style="line-height: 37px">
+                    {{ discord_tag }}
                   </div>
                 </div>
-              </form>
-            {% endif %}
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                  <div class="pull-right">
+                    <button type="button" class="btn btn-primary btn-lg waves-effect" id="ping-button">PING</button>
+                    <button class="btn btn-primary btn-lg waves-effect" id="remove-discord-button">REMOVER</button>
+                  </div>
+                </div>
+              </div>
+            </form>
             <form id="update-discord-form" {% if discord_tag %}hidden{% endif %}>
+              {% csrf_token %}
               <div class="row clearfix">
                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
                   <div class="form-group form-float">
                     <div class="form-line">
-                      <input type="text" class="form-control">
+                      <input type="text" class="form-control" name="discord-tag">
                       <label class="form-label">Discord Tag</label>
                     </div>
                   </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                   <div class="pull-right">
-                    <button type="button" class="btn btn-primary btn-lg waves-effect">ADICIONAR</button>
+                    <button class="btn btn-primary btn-lg waves-effect" id="update-discord-button">CADASTRAR</button>
                   </div>
                 </div>
               </div>
@@ -262,9 +271,7 @@
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
 
-<!-- update-user-form script -->
-{% if discord_tag %}<!-- remove-discord-form script -->{% endif %}
-<!-- update-discord-form script -->
+<script src="{% static 'core/js/settings.js' %}"></script>
 </body>
 
 </html>

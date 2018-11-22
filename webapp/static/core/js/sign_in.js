@@ -1,5 +1,4 @@
 let handlingRequest = false;
-let requestDone = false;
 
 $(function () {
   $('#sign-in-form').validate({
@@ -22,6 +21,7 @@ $(function () {
       const submitButton = document.getElementById('submit-button');
       submitButton.disabled = true;
 
+      let requestDone = false;
       const req = new XMLHttpRequest();
       req.onreadystatechange = () => {
         if (req.readyState === 4 && req.status === 200) {
@@ -51,6 +51,5 @@ $(function () {
       req.open('POST', '/ajax/sign_in', true);
       req.send(new FormData(form));
     }
-  })
-  ;
+  });
 });

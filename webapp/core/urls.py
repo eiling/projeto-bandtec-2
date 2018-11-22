@@ -20,6 +20,8 @@ urlpatterns = [
     path('ajax/ping', ajax.ping),
     path('ajax/change_agent', ajax.change_agent),
     path('ajax/remove_agent', ajax.remove_agent),
+    path('ajax/remove_discord', ajax.remove_discord),
+    path('ajax/update_user', ajax.update_user),
 
     path('test', views.test),
     path('ajax_test', views.ajax_test),

@@ -56,6 +56,7 @@
 <nav class="navbar">
   <div class="container-fluid">
     <div class="navbar-header">
+      <a href="javascript:void(0);" class="bars"></a>
       <span class="navbar-brand" href="not_used/index.html">EAGLE</span>
     </div>
   </div>
@@ -67,7 +68,7 @@
     <!-- User Info -->
     <div class="user-info">
       <div class="info-container">
-        Olá, USER_NAME.
+        Olá, {{ name }}!
       </div>
     </div>
     <!-- #User Info -->
@@ -199,7 +200,7 @@
                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
                   <div class="form-group form-float">
                     <div class="form-line">
-                      <input type="text" class="form-control">
+                      <input type="text" class="form-control" name="discord-tag">
                       <label class="form-label">Discord Tag</label>
                     </div>
                   </div>
@@ -270,9 +271,7 @@
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
 
-<!-- update-user-form script -->
-<!-- remove-discord-form script -->
-<!-- update-discord-form script -->
+<script src="{% static 'core/js/settings.js' %}"></script>
 </body>
 
 </html>

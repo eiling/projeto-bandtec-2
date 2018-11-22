@@ -4,3 +4,5 @@ from core.ajax.setup_discord_dm import *
 from core.ajax.query_last_data import *
 from core.ajax.ping import *
 from core.ajax.agent_config import *
+from core.ajax.remove_discord import *
+from core.ajax.update_user import *

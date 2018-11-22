@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.shortcuts import render, redirect
 
 from util.protocol import get_manager_response
@@ -45,6 +46,13 @@ def settings(request):
 
     if res['type'] == 0:
         context['discord_tag'] = res['content']['discordTag']
+
+    res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
 
     return render(request, 'core/settings.html', context)
 

@@ -76,13 +76,13 @@
     <div class="menu">
       <ul class="list">
         <li>
-          <a href="old/index.html">
+          <a href="/panel">
             <i class="material-icons">dashboard</i>
             <span>Painel</span>
           </a>
         </li>
         <li>
-          <a href="/">
+          <a href="/records">
             <i class="material-icons">assessment</i>
             <span>Relatórios</span>
           </a>
@@ -229,19 +229,11 @@
             <div class="row clearfix">
               {% if agents %}
                 {% for agent in agents %}
-                  {% if agent.connected %}
-                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                      <a href="/config/{{ agent.id }}" class="btn btn-block btn-lg btn-success waves-effect">
-                        {{ agent.name }} - CONECTADO
-                      </a>
-                    </div>
-                  {% else %}
-                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                      <a href="/config/{{ agent.id }}" class="btn btn-block btn-lg btn-danger waves-effect">
-                        {{ agent.name }} - DESCONECTADO
-                      </a>
-                    </div>
-                  {% endif %}
+                  <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <a href="/settings/{{ agent.id }}" class="btn btn-block btn-lg btn-default waves-effect">
+                      {{ agent.name }}
+                    </a>
+                  </div>
                 {% endfor %}
               {% else %}
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

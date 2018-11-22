@@ -32,6 +32,13 @@
 
   <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
   <link href="{% static 'adminbsb/css/themes/theme-blue.css' %}" rel="stylesheet"/>
+
+  <style>
+    .custom-info-box-text {
+      line-height: 80px;
+      padding-left: 20px;
+    }
+  </style>
 </head>
 
 <body class="theme-blue">
@@ -71,7 +78,7 @@
     <!-- User Info -->
     <div class="user-info">
       <div class="info-container">
-        Olá, USER_NAME.
+        Olá, {{ name }}!
       </div>
     </div>
     <!-- #User Info -->
@@ -79,19 +86,19 @@
     <div class="menu">
       <ul class="list">
         <li class="active">
-          <a href="old/index.html">
+          <a href="/panel">
             <i class="material-icons">dashboard</i>
             <span>Painel</span>
           </a>
         </li>
         <li>
-          <a href="/">
+          <a href="/records">
             <i class="material-icons">assessment</i>
             <span>Relatórios</span>
           </a>
         </li>
         <li>
-          <a href="/">
+          <a href="/settings">
             <i class="material-icons">settings</i>
             <span>Configurações</span>
           </a>
@@ -125,13 +132,44 @@
     <div class="row clearfix">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
+          <div class="header">
+            <h2>
+              Agentes de monitoração
+              <small>Selecione um agente para visualizar.</small>
+            </h2>
+          </div>
           <div class="body">
-            <select class="js-animations form-control show-tick">
-              <optgroup label="Agentes">
-                <option value="AGENT_ID">AGENT_NAME</option>
-                <option value="AGENT_ID">AGENT_NAME</option>
-              </optgroup>
-            </select>
+            <div class="row clearfix">
+              {% if agents %}
+                {% for agent in agents %}
+                  {% if agent.connected %}
+                    <a href="/panel/{{ agent.id }}" class="col-lg-4 col-md-4 col-sm-6 col-xs-12"
+                       style="text-decoration: none">
+                      <div class="info-box bg-blue hover-expand-effect">
+                        <div class="icon">
+                          <i class="material-icons">laptop_chromebook</i>
+                        </div>
+                        <div class="custom-info-box-text">{{ agent.name }}</div>
+                      </div>
+                    </a>
+                  {% else %}
+                    <a class="col-lg-4 col-md-4 col-sm-6 col-xs-12"
+                       style="text-decoration: none" disabled="">
+                      <div class="info-box bg-grey">
+                        <div class="icon">
+                          <i class="material-icons">laptop_chromebook</i>
+                        </div>
+                        <div class="custom-info-box-text">{{ agent.name }}</div>
+                      </div>
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  No agents to display.
+                </div>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>

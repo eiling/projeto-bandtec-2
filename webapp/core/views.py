@@ -6,29 +6,58 @@ from util.protocol import get_manager_response
 
 def sign_in(request):
     if 'user_id' in request.session.keys():
-        return redirect('/main_page')
+        return redirect('/panel')
 
     return render(request, 'core/sign-in.html')
 
 
 def sign_up(request):
     if 'user_id' in request.session.keys():
-        return redirect('/main_page')
+        return redirect('/panel')
 
     return render(request, 'core/old/signup.html')
 
 
-def main_page(request):
+def panel(request):
     if 'user_id' not in request.session.keys():
         return redirect('/')
 
     res = get_manager_response({'type': 4, 'content': {'userId': request.session['user_id']}})
+    agents = res['content']['agents']
 
     context = {
-        'agents': res['content']['agents'],
+        'agents': agents,
     }
 
-    return render(request, 'core/old/main_page.html', context)
+    res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    return render(request, 'core/panel.html', context)
+
+
+def records(request):
+    if 'user_id' not in request.session.keys():
+        return redirect('/')
+
+    res = get_manager_response({'type': 4, 'content': {'userId': request.session['user_id']}})
+    agents = res['content']['agents']
+
+    context = {
+        'agents': agents,
+    }
+
+    res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    return render(request, 'core/records.html', context)
 
 
 def settings(request):
@@ -57,18 +86,6 @@ def settings(request):
     return render(request, 'core/settings.html', context)
 
 
-def details(request, agent_id):
-    if 'user_id' not in request.session.keys():
-        return redirect('/')
-
-    res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
-
-    if res['type'] == 0:
-        return render(request, 'core/old/details.html', {'agent': res['content']['agent']})
-    else:
-        return render(request, 'core/old/details.html')
-
-
 def agent_config(request, agent_id):
     if 'user_id' not in request.session.keys():
         return redirect('/')
@@ -85,6 +102,31 @@ def logout(request):
     request.session.flush()
 
     return redirect('/')
+
+
+def details(request, agent_id):
+    if 'user_id' not in request.session.keys():
+        return redirect('/')
+
+    res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        return render(request, 'core/old/details.html', {'agent': res['content']['agent']})
+    else:
+        return render(request, 'core/old/details.html')
+
+
+def main_page(request):
+    if 'user_id' not in request.session.keys():
+        return redirect('/')
+
+    res = get_manager_response({'type': 4, 'content': {'userId': request.session['user_id']}})
+
+    context = {
+        'agents': res['content']['agents'],
+    }
+
+    return render(request, 'core/old/main_page.html', context)
 
 
 def test(request):

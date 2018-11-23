@@ -6,9 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <title>Welcome To | Bootstrap Based Admin Template - Material Design</title>
-  <!-- Favicon-->
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>Painel - Eagle</title>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet"
@@ -78,7 +76,7 @@
     <!-- User Info -->
     <div class="user-info">
       <div class="info-container">
-        Olá, {{ name }}!
+        <b>Olá, {{ name }}!</b>
       </div>
     </div>
     <!-- #User Info -->
@@ -138,13 +136,13 @@
               <small>Selecione um agente para visualizar.</small>
             </h2>
           </div>
-          <div class="body">
+          <div class="body" style="padding-bottom: 0">
             <div class="row clearfix">
               {% if agents %}
                 {% for agent in agents %}
                   {% if agent.connected %}
                     <a href="/panel/{{ agent.id }}" class="col-lg-4 col-md-4 col-sm-6 col-xs-12"
-                       style="text-decoration: none">
+                       style="text-decoration: none; margin-bottom: 0;">
                       <div class="info-box bg-blue hover-expand-effect">
                         <div class="icon">
                           <i class="material-icons">laptop_chromebook</i>
@@ -154,7 +152,7 @@
                     </a>
                   {% else %}
                     <a class="col-lg-4 col-md-4 col-sm-6 col-xs-12"
-                       style="text-decoration: none" disabled="">
+                       style="text-decoration: none; margin-bottom: 0;" disabled="">
                       <div class="info-box bg-grey">
                         <div class="icon">
                           <i class="material-icons">laptop_chromebook</i>

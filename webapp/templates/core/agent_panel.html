@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <title>Relatórios - Eagle</title>
+  <title>Painel - Eagle</title>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet"
@@ -30,13 +30,6 @@
 
   <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
   <link href="{% static 'adminbsb/css/themes/theme-blue.css' %}" rel="stylesheet"/>
-
-  <style>
-    .custom-label {
-      width: 125px;
-      text-align: left;
-    }
-  </style>
 </head>
 
 <body class="theme-blue">
@@ -83,13 +76,13 @@
     <!-- Menu -->
     <div class="menu">
       <ul class="list">
-        <li>
+        <li class="active">
           <a href="/panel">
             <i class="material-icons">dashboard</i>
             <span>Painel</span>
           </a>
         </li>
-        <li class="active">
+        <li>
           <a href="/records">
             <i class="material-icons">assessment</i>
             <span>Relatórios</span>
@@ -131,56 +124,12 @@
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
           <div class="header">
-            <h2>
-              Relatórios
-              <small>Selecione um agente e defina o período para visualizar.</small>
-            </h2>
-          </div>
-          <div class="body" style="padding-bottom: 0">
-            <form action="/results" method="get">
-              <div class="row clearfix">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <select class="js-animations form-control show-tick" name="agent-select">
-                    <optgroup label="Agentes">
-                      {% if agents %}
-                        {% for agent in agents %}
-                          <option value="{{ agent.id }}">{{ agent.name }}</option>
-                        {% endfor %}
-                      {% endif %}
-                    </optgroup>
-                  </select>
-                </div>
-              </div>
-              <div class="row clearfix">
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 0">
-                  <div class="input-group">
-                    <span class="input-group-addon custom-label">
-                      <label for="begin-date-field">Início do período:</label>
-                    </span>
-                    <div class="form-line">
-                      <input type="date" class="form-control date" name="begin-date" id="begin-date-field">
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 0">
-                  <div class="input-group">
-                    <span class="input-group-addon custom-label">
-                      <label for="end-date-field">Fim do período:</label>
-                    </span>
-                    <div class="form-line">
-                      <input type="date" class="form-control date" name="end-date" id="end-date-field">
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                  <div class="pull-right">
-                    <button class="btn btn-lg btn-primary waves-effect" id="records-button">
-                      GERAR GRÁFICOS
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </form>
+            <div style="float: left; margin-right: 20px">
+              <a href="/panel"><i class="material-icons">arrow_back</i></a>
+            </div>
+            <div>
+              <h2 style="line-height: 24px">TESTE{{ agent_name }}</h2>
+            </div>
           </div>
         </div>
       </div>

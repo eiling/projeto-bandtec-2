@@ -102,6 +102,10 @@ models.sequelize.sync({force: false}).then(() => {
           WebappHandler.updateUser(this, content.userId, content.currentPassword, content.params);
           break;
 
+        case 13:
+          WebappHandler.getAgentRecords(this, content.userId, content.agentId, content.beginDate, content.endDate);
+          break;
+
         default:
           console.log('unknown message type');
           break;

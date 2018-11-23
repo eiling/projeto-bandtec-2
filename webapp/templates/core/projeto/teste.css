@@ -1,0 +1,28 @@
+form{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+.no-outline{
+    outline: none;
+}
+
+
+#btnentrar{
+    background:#795548;
+    color:white;
+}
+
+#btncadas{
+  margin-left: 68px;
+  background:#795548;
+  color:white;
+}
+
+
+
+
+

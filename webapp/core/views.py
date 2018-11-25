@@ -90,7 +90,21 @@ def agent_panel(request, agent_id):
     if 'user_id' not in request.session.keys():
         return redirect('/')
 
-    return render(request, 'core/agent_panel.html')
+    context = {}
+
+    res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['agent_name'] = res['content']['agent']['name']
+
+    res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    return render(request, 'core/agent_panel.html', context)
 
 
 def agent_settings(request, agent_id):

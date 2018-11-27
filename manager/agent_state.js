@@ -223,65 +223,67 @@ function AgentState(userId, agentId, agentName, agentInterval, agentCpu, agentMe
 
         this.memoryAlertState_ = {};
       }
-      for (let i of data.fileStores) {
-        if (i.mount !== 'C:\\' && i.mount !== '/') continue;
+      if (data.fileStores) {
+        for (let i of data.fileStores) {
+          if (i.mount !== 'C:\\' && i.mount !== '/') continue;
 
-        if (this.disk <= 0 && this.disk >= -100) {
-          if (100 - i.usableSpace * 100 / i.totalSpace > -this.disk) {
-            if (!this.diskAlertState_.alert) {
-              Util.sendAlertToBot(this.userId, {
-                name: this.name,
-                resource: 'partição de disco primária',
-                threshold: this.disk,
-                timestamp: now,
-              }, response => {
-                console.log(response);  // handle error when sending message
-              });
+          if (this.disk <= 0 && this.disk >= -100) {
+            if (100 - i.usableSpace * 100 / i.totalSpace > -this.disk) {
+              if (!this.diskAlertState_.alert) {
+                Util.sendAlertToBot(this.userId, {
+                  name: this.name,
+                  resource: 'partição de disco primária',
+                  threshold: this.disk,
+                  timestamp: now,
+                }, response => {
+                  console.log(response);  // handle error when sending message
+                });
 
-              this.diskAlertState_.alert = true;
-              this.diskAlertState_.threshold = this.disk;
-              this.diskAlertState_.time = new Date(now).toISOString();
-            }
-          } else {
-            if (this.diskAlertState_.alert) {
-              Util.saveAlert('DISK', this.diskAlertState_.threshold,
+                this.diskAlertState_.alert = true;
+                this.diskAlertState_.threshold = this.disk;
+                this.diskAlertState_.time = new Date(now).toISOString();
+              }
+            } else {
+              if (this.diskAlertState_.alert) {
+                Util.saveAlert('DISK', this.diskAlertState_.threshold,
                   this.diskAlertState_.time, new Date(now).toISOString(),
                   this.agentId);
 
-              this.diskAlertState_ = {};
+                this.diskAlertState_ = {};
+              }
             }
-          }
-        } else if (this.disk > 0) {
-          if (i.usableSpace < this.disk) {
-            if (!this.diskAlertState_.alert) {
-              Util.sendAlertToBot(this.userId, {
-                name: this.name,
-                resource: 'partição de disco primária',
-                threshold: this.disk,
-                timestamp: now,
-              }, response => {
-                console.log(response);  // handle error when sending message
-              });
+          } else if (this.disk > 0) {
+            if (i.usableSpace < this.disk) {
+              if (!this.diskAlertState_.alert) {
+                Util.sendAlertToBot(this.userId, {
+                  name: this.name,
+                  resource: 'partição de disco primária',
+                  threshold: this.disk,
+                  timestamp: now,
+                }, response => {
+                  console.log(response);  // handle error when sending message
+                });
 
-              this.diskAlertState_.alert = true;
-              this.diskAlertState_.threshold = this.disk;
-              this.diskAlertState_.time = new Date(now).toISOString();
-            }
-          } else {
-            if (this.diskAlertState_.alert) {
-              Util.saveAlert('DISK', this.diskAlertState_.threshold,
+                this.diskAlertState_.alert = true;
+                this.diskAlertState_.threshold = this.disk;
+                this.diskAlertState_.time = new Date(now).toISOString();
+              }
+            } else {
+              if (this.diskAlertState_.alert) {
+                Util.saveAlert('DISK', this.diskAlertState_.threshold,
                   this.diskAlertState_.time, new Date(now).toISOString(),
                   this.agentId);
 
-              this.diskAlertState_ = {};
+                this.diskAlertState_ = {};
+              }
             }
-          }
-        } else if (this.diskAlertState_.alert) {
-          Util.saveAlert('DISK', this.diskAlertState_.threshold,
+          } else if (this.diskAlertState_.alert) {
+            Util.saveAlert('DISK', this.diskAlertState_.threshold,
               this.diskAlertState_.time, new Date(now).toISOString(),
               this.agentId);
 
-          this.diskAlertState_ = {};
+            this.diskAlertState_ = {};
+          }
         }
       }
 
@@ -326,12 +328,12 @@ AgentState.prototype.start = function () {
 };
 
 AgentState.prototype.get = function () {  // can we have a race condition here?
-  const len = this.dataQueue.length;
+  const len = this.dataQueue.length;  // between here...
   if (len === 0) {
     return {};
   }
 
-  const data = this.dataQueue[len - 1];
+  const data = this.dataQueue[len - 1];  // and here
 
   return {
     data: data,

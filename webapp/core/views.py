@@ -1,4 +1,5 @@
 # coding=utf-8
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from util.protocol import get_manager_response
@@ -90,12 +91,22 @@ def agent_panel(request, agent_id):
     if 'user_id' not in request.session.keys():
         return redirect('/')
 
-    context = {}
+    res = get_manager_response({'type': 2, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
+
+    if res['type'] == 1:
+        return redirect('/panel')
+    elif res['type'] != 0:
+        return HttpResponse('Agent not found', content_type='text/plain')
+
+    context = {
+        'data': res['content']['data']
+    }
 
     res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
 
     if res['type'] == 0:
         context['agent_name'] = res['content']['agent']['name']
+        context['agent_id'] = res['content']['agent']['id']
 
     res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
 

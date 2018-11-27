@@ -70,7 +70,7 @@ models.sequelize.sync({force: false}).then(() => {
           WebappHandler.getAgents(this, content.userId, agents);
           break;
 
-        case 5:  // get agents
+        case 5:  // get agent
           WebappHandler.getAgent(this, content.userId, content.agentId);
           break;
 

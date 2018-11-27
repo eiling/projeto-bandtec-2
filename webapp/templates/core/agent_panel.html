@@ -135,17 +135,54 @@
       </div>
     </div>
     <div class="row clearfix">
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-        <div class="info-box-4">
-          <div class="icon">
-            <i class="material-icons col-blue">shopping_cart</i>
-          </div>
-          <div class="content">
-            <div class="text">NEW ORDERS</div>
-            <div class="number">125</div>
-          </div>
+      {% if data.processor %}
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+          <a tabindex="0" role="button" class="info-box-4" data-trigger="focus hover" data-container="body"
+             data-toggle="popover" data-placement="top" data-content="" id="processor-popover"
+             style="text-decoration: none">
+            <div class="icon">
+              <i class="material-icons col-blue" id="processor-icon">devices</i>
+            </div>
+            <div class="content">
+              <div class="text">USO DE CPU</div>
+              <div class="number" id="processor-box"></div>
+            </div>
+          </a>
         </div>
-      </div>
+      {% endif %}
+      {% if data.memory %}
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+          <a tabindex="0" role="button" class="info-box-4" data-trigger="focus hover" data-container="body"
+             data-toggle="popover" data-placement="top" data-content="" id="memory-popover"
+             style="text-decoration: none">
+            <div class="icon">
+              <i class="material-icons col-blue" id="memory-icon">memory</i>
+            </div>
+            <div class="content">
+              <div class="text">USO DE MEMÓRIA</div>
+              <div class="number" id="memory-box"></div>
+            </div>
+          </a>
+        </div>
+      {% endif %}
+      {% if data.fileStores %}
+        {% for partition in data.fileStores %}
+          <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <a tabindex="0" role="button" class="info-box-4" data-trigger="focus hover" data-container="body"
+               data-toggle="popover" data-placement="top" data-content="" id="partition-{{ forloop.counter0 }}-popover"
+               style="text-decoration: none">
+              <div class="icon">
+                <i class="material-icons col-blue"
+                   {% if partition.mount == 'C:\\' or partition.mount == '/' %}id="disk-icon"{% endif %}>storage</i>
+              </div>
+              <div class="content">
+                <div class="text">USO DE DISCO {{ partition.mount }}</div>
+                <div class="number" id="partition-{{ forloop.counter0 }}-box"></div>
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      {% endif %}
     </div>
     <div class="row clearfix">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -153,47 +190,64 @@
           <div class="body" style="padding-bottom: 0; padding-top: 0;">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
-              <li role="presentation" class="active">
-                <a href="#home_with_icon_title" data-toggle="tab">
-                  <i class="material-icons">home</i> HOME
-                </a>
-              </li>
-              <li role="presentation">
-                <a href="#profile_with_icon_title" data-toggle="tab">
-                  <i class="material-icons">face</i> PROFILE
-                </a>
-              </li>
+              {% if data.processor %}
+                <li role="presentation" class="active">
+                  <a href="#processor-chart" data-toggle="tab">
+                    <i class="material-icons">home</i> CPU
+                  </a>
+                </li>
+              {% endif %}
+              {% if data.memory %}
+                <li role="presentation" {% if not data.processor %}class="active"{% endif %}>
+                  <a href="#memory-chart" data-toggle="tab">
+                    <i class="material-icons">home</i> MEMÓRIA
+                  </a>
+                </li>
+              {% endif %}
+              {% if data.fileStores %}
+                {% for partition in data.fileStores %}
+                  <li role="presentation"
+                      {% if not data.processor and not data.memory %}{% if forloop.first %} class="active"
+                      {% endif %}{% endif %}>
+                    <a href="#partition-{{ forloop.counter0 }}-chart" data-toggle="tab">
+                      <i class="material-icons">home</i> DISCO {{ partition.mount }}
+                    </a>
+                  </li>
+                {% endfor %}
+              {% endif %}
             </ul>
             <!-- Tab panes -->
             <div class="tab-content">
-              <div role="tabpanel" class="tab-pane fade in active" id="home_with_icon_title">
-                <b>Home Content</b>
-                <p>
-                  Lorem ipsum dolor sit amet, ut duo atqui exerci dicunt, ius impedit mediocritatem an. Pri ut tation
-                  electram moderatius.
-                  Per te suavitate democritum. Duis nemore probatus ne quo, ad liber essent aliquid
-                  pro. Et eos nusquam accumsan, vide mentitum fabellas ne est, eu munere gubergren
-                  sadipscing mel.
-                </p>
-              </div>
-              <div role="tabpanel" class="tab-pane fade in active" id="profile_with_icon_title">
-                <b>Home Content</b>
-                <p>
-                  Lorem ipsum dolor sit amet, ut duo atqui exerci dicunt, ius impedit mediocritatem an. Pri ut tation
-                  electram moderatius.
-                  Per te suavitate democritum. Duis nemore probatus ne quo, ad liber essent aliquid
-                  pro. Et eos nusquam accumsan, vide mentitum fabellas ne est, eu munere gubergren
-                  sadipscing mel.
-                </p>
-              </div>
+              {% if data.processor %}
+                <div role="tabpanel" class="tab-pane fade in active" id="processor-chart">
+                  <div style="height: 300px; background-color: grey"></div>
+                </div>
+              {% endif %}
+              {% if data.memory %}
+                <div role="tabpanel" class="tab-pane fade{% if not data.processor %} in active{% endif %}"
+                     id="memory-chart">
+                  <div style="height: 300px; background-color: grey"></div>
+                </div>
+              {% endif %}
+              {% if data.fileStores %}
+                {% for partition in data.fileStores %}
+                  <div role="tabpanel"
+                       class="tab-pane fade
+                           {% if not data.processor and not data.memory %}{% if forloop.first %} in active{% endif %}{% endif %}"
+                       id="partition-{{ forloop.counter0 }}-chart">
+                    <div style="height: 300px; background-color: grey"></div>
+                  </div>
+                {% endfor %}
+              {% endif %}
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </section>
+
+<div id="agent-id-field" hidden>{{ agent_id }}</div>
 
 <!-- Jquery Core Js -->
 <script src="{% static 'adminbsb/plugins/jquery/jquery.min.js' %}"></script>
@@ -212,6 +266,37 @@
 
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
+
+<script src="{% static 'core/js/format_bytes.js' %}"></script>
+<!-- Initialization script -->
+<script>
+  {% if data.processor %}
+    document.getElementById('processor-box').innerText =
+        `${parseFloat(parseFloat({{ data.processor.systemCpuLoad }}) * 100).toFixed(1)}%`;
+    document.getElementById('processor-popover')
+        .setAttribute('data-content', '{{ data.processor.name }}');
+  {% endif %}
+  {% if data.memory %}
+    const a = parseFloat({{ data.memory.available }});
+    const t = parseFloat({{ data.memory.total }});
+    document.getElementById('memory-box').innerText = `${parseFloat(100 - (a * 100 / t)).toFixed(1)}%`;
+    document.getElementById('memory-popover')
+        .setAttribute('data-content', formatBytes(a) + ' (disponível) / ' + formatBytes(t) + ' (total)');
+  {% endif %}
+  {% if data.fileStores %}
+    {% for partition in data.fileStores %}
+      {
+        const m = parseInt({{ forloop.counter0 }});
+        const a = parseFloat({{ partition.usableSpace }});
+        const t = parseFloat({{ partition.totalSpace }});
+        document.getElementById(`partition-${m}-box`).innerText = `${parseFloat(100 - (a * 100 / t)).toFixed(1)}%`;
+        document.getElementById(`partition-${m}-popover`)
+            .setAttribute('data-content', formatBytes(a) + ' (disponível) / ' + formatBytes(t) + ' (total)');
+      }
+    {% endfor %}
+  {% endif %}
+</script>
+<script src="{% static 'core/js/agent_panel.js' %}"></script>
 </body>
 
 </html>

@@ -384,7 +384,7 @@ function getUser(protocol, userId) {
         message: err.toString(),
       },
     });
-  })
+  });
 }
 
 function updateUser(protocol, userId, currentPassword, params) {
@@ -431,6 +431,31 @@ function updateUser(protocol, userId, currentPassword, params) {
   });
 }
 
+function getAgentRecords(protocol, userId, agentId, beginDate, endDate){
+  models.Agent.findOne({
+    where: {
+      id: agentId,
+      userId: userId,
+    }
+  }).then(agent => {
+    if (agent) {
+      protocol.send({
+        type: 0,
+        content: {
+          agentName: agent.name,
+        },
+      });
+    } else {
+      protocol.send({
+        type: 1,
+        content: {
+          message: 'Error in getAgentRecords()',
+        },
+      });
+    }
+  });
+}
+
 module.exports = {
   authenticateUser,
   signUp,
@@ -445,4 +470,5 @@ module.exports = {
   removeDiscord,
   getUser,
   updateUser,
+  getAgentRecords,
 };

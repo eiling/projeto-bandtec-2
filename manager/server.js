@@ -70,7 +70,7 @@ models.sequelize.sync({force: false}).then(() => {
           WebappHandler.getAgents(this, content.userId, agents);
           break;
 
-        case 5:  // get agents
+        case 5:  // get agent
           WebappHandler.getAgent(this, content.userId, content.agentId);
           break;
 
@@ -100,6 +100,10 @@ models.sequelize.sync({force: false}).then(() => {
 
         case 12:
           WebappHandler.updateUser(this, content.userId, content.currentPassword, content.params);
+          break;
+
+        case 13:
+          WebappHandler.getAgentRecords(this, content.userId, content.agentId, content.beginDate, content.endDate);
           break;
 
         default:

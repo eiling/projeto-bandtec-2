@@ -1,4 +1,5 @@
 # coding=utf-8
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from util.protocol import get_manager_response
@@ -86,7 +87,38 @@ def settings(request):
     return render(request, 'core/settings.html', context)
 
 
-def agent_config(request, agent_id):
+def agent_panel(request, agent_id):
+    if 'user_id' not in request.session.keys():
+        return redirect('/')
+
+    res = get_manager_response({'type': 2, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
+
+    if res['type'] == 1:
+        return redirect('/panel')
+    elif res['type'] != 0:
+        return HttpResponse('Agent not found', content_type='text/plain')
+
+    context = {
+        'data': res['content']['data']
+    }
+
+    res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['agent_name'] = res['content']['agent']['name']
+        context['agent_id'] = res['content']['agent']['id']
+
+    res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    return render(request, 'core/agent_panel.html', context)
+
+
+def agent_settings(request, agent_id):
     if 'user_id' not in request.session.keys():
         return redirect('/')
 
@@ -98,10 +130,46 @@ def agent_config(request, agent_id):
         return render(request, 'core/old/agent_config.html')
 
 
+def results(request):
+    if 'user_id' not in request.session.keys():
+        return redirect('/')
+
+    context = {
+        'begin_date': request.GET['begin-date'],
+        'end_date': request.GET['end-date'],
+    }
+
+    res = get_manager_response({'type': 13, 'content': {
+        'userId': request.session['user_id'],
+        'agentId': request.GET['agent-select'],
+        'beginDate': request.GET['begin-date'],
+        'endDate': request.GET['end-date'],
+    }})
+
+    if res['type'] == 0:
+        context['agent_name'] = res['content']['agentName']
+
+    res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    return render(request, 'core/results.html', context)
+
+
 def logout(request):
     request.session.flush()
 
     return redirect('/')
+
+
+
+
+
+
+
 
 
 def details(request, agent_id):

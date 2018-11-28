@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <title>Configurações - EAGLE</title>
+  <title>Configurações - Eagle</title>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet"
@@ -68,7 +68,7 @@
     <!-- User Info -->
     <div class="user-info">
       <div class="info-container">
-        Olá, {{ name }}!
+        <b>Olá, {{ name }}!</b>
       </div>
     </div>
     <!-- #User Info -->
@@ -177,11 +177,16 @@
               <small>Cadastrar conta para alertas via mensagem direta.</small>
             </h2>
           </div>
-          <div class="body">
+          <div class="body" style="padding-bottom: 0">
+            <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/T4sGrHx"
+               class="btn btn-block btn-lg bg-indigo waves-effect"
+               style="margin-bottom: 25px">
+              JUNTE-SE A NÓS NO DISCORD!
+            </a>
             <form id="remove-discord-form" {% if not discord_tag %}hidden{% endif %}>
               {% csrf_token %}
               <div class="row clearfix">
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" style="margin-bottom: 0">
                   <div class="form-group form-float" style="line-height: 37px">
                     {{ discord_tag }}
                   </div>
@@ -197,7 +202,7 @@
             <form id="update-discord-form" {% if discord_tag %}hidden{% endif %}>
               {% csrf_token %}
               <div class="row clearfix">
-                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12" style="margin-bottom: 0">
                   <div class="form-group form-float">
                     <div class="form-line">
                       <input type="text" class="form-control" name="discord-tag">
@@ -225,7 +230,7 @@
               <small>Alterar configurações de agente.</small>
             </h2>
           </div>
-          <div class="body">
+          <div class="body" style="padding-bottom: 0">
             <div class="row clearfix">
               {% if agents %}
                 {% for agent in agents %}

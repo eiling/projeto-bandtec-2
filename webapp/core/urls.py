@@ -8,9 +8,10 @@ urlpatterns = [
     path('panel', views.panel),
     path('records', views.records),
     path('settings', views.settings),
-    path('settings/<int:agent_id>', views.agent_config),
+    path('panel/<int:agent_id>', views.agent_panel),
+    path('settings/<int:agent_id>', views.agent_settings),
+    path('results', views.results),  # records
     path('main_page', views.main_page),  # remove later
-    path('details/<int:agent_id>', views.details),  # remove later
 
     path('logout', views.logout),
 

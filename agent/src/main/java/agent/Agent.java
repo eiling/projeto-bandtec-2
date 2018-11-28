@@ -70,7 +70,7 @@ public class Agent implements AutoCloseable {
       loggedIn = true;
       setId(response.getJSONObject("content").getInt("id"));
 
-      return "You're in";
+      return "Logged in";
     } else {
       return response.getJSONObject("content").getString("message");
     }
@@ -84,10 +84,14 @@ public class Agent implements AutoCloseable {
     while (true) {
       var request = protocol.receive();
 
+      Logger.log("Received request");
+
       if (request.getInt("type") == 0) {
         var content = new JSONObject();
 
         var resources = request.getJSONObject("content").getJSONArray("resources");
+
+        Logger.log("Request resources: " + resources);
 
         for(int i = 0, l = resources.length(); i < l; i++){
           switch (resources.getString(i)){
@@ -108,12 +112,14 @@ public class Agent implements AutoCloseable {
           }
         }
 
+        Logger.log("Sending data");
+
         protocol.send(new JSONObject()
             .put("type", 0)
             .put("content", content)
         );
       } else {
-        System.out.println("broke");
+        Logger.log("Request status is not zero");
         break;
       }
     }

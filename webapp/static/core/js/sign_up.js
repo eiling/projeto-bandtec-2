@@ -1,7 +1,12 @@
 let handlingRequest = false;
 
 $(function () {
-  $('#sign-in-form').validate({
+  $('#sign-up-form').validate({
+    rules: {
+      'confirm': {
+        equalTo: '[name="password"]',
+      },
+    },
     highlight: function (input) {
       console.log(input);
       $(input).parents('.form-line').addClass('error');
@@ -11,6 +16,7 @@ $(function () {
     },
     errorPlacement: function (error, element) {
       $(element).parents('.input-group').append(error);
+      $(element).parents('.form-group').append(error);
     },
     submitHandler: function (form) {
       if (handlingRequest) {
@@ -34,13 +40,15 @@ $(function () {
           const obj = JSON.parse(req.responseText);
 
           if (obj.status === 0) {
-            window.location.reload();
+            swal({
+              title: 'Sucesso!',
+              icon: 'success',
+            }, () => window.location.replace('/'));
           } else {
-            const alert = document.getElementById('alert-div');
-            alert.innerText = 'Erro ao autenticar. Verifique seus dados e tente novamente.';
-            alert.hidden = false;
-            form.reset();
-            document.getElementById('username-field').focus();
+            swal({
+              title: 'Ocorreu um erro!',
+              icon: 'error',
+            }, () => window.location.reload());
           }
 
           submitButton.disabled = false;
@@ -48,7 +56,7 @@ $(function () {
         }
       };
 
-      req.open('POST', '/ajax/sign_in', true);
+      req.open('POST', '/ajax/sign_up', true);
       req.send(new FormData(form));
 
       return false;

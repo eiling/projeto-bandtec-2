@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <title>Configurações - Eagle</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet"
+        type="text/css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+
+  <!-- Bootstrap Core Css -->
+  <link href="{% static 'adminbsb/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+
+  <!-- Waves Effect Css -->
+  <link href="{% static 'adminbsb/plugins/node-waves/waves.css' %}" rel="stylesheet"/>
+
+  <!-- Animation Css -->
+  <link href="{% static 'adminbsb/plugins/animate-css/animate.css' %}" rel="stylesheet"/>
+
+  <!-- Custom Css -->
+  <link href="{% static 'adminbsb/css/style.css' %}" rel="stylesheet">
+
+  <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
+  <link href="{% static 'adminbsb/css/themes/theme-blue.css' %}" rel="stylesheet"/>
+
+  <link rel="shortcut icon" href="{% static 'core/images/eagle-emblem_38348.png' %}">
+</head>
+
+<body class="theme-blue">
+<!-- Page Loader -->
+<div class="page-loader-wrapper">
+  <div class="loader">
+    <div class="preloader">
+      <div class="spinner-layer pl-red">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+    <p>Please wait...</p>
+  </div>
+</div>
+<!-- #END# Page Loader -->
+<!-- Overlay For Sidebars -->
+<div class="overlay"></div>
+<!-- #END# Overlay For Sidebars -->
+<!-- Top Bar -->
+<nav class="navbar">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a href="javascript:void(0);" class="bars"></a>
+      <span class="navbar-brand" href="not_used/index.html">EAGLE</span>
+    </div>
+  </div>
+</nav>
+<!-- #Top Bar -->
+<section>
+  <!-- Left Sidebar -->
+  <aside id="leftsidebar" class="sidebar">
+    <!-- User Info -->
+    <div class="user-info">
+      <div class="info-container">
+        <b>Olá, {{ name }}!</b>
+      </div>
+    </div>
+    <!-- #User Info -->
+    <!-- Menu -->
+    <div class="menu">
+      <ul class="list">
+        <li>
+          <a href="/panel">
+            <i class="material-icons">dashboard</i>
+            <span>Painel</span>
+          </a>
+        </li>
+        <li>
+          <a href="/records">
+            <i class="material-icons">assessment</i>
+            <span>Relatórios</span>
+          </a>
+        </li>
+        <li class="active">
+          <a href="/settings">
+            <i class="material-icons">settings</i>
+            <span>Configurações</span>
+          </a>
+        </li>
+        <hr style="margin: 0;">
+        <li>
+          <a href="/logout">
+            <i class="material-icons">input</i>
+            <span>Sair</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- #Menu -->
+    <!-- Footer -->
+    <div class="legal">
+      <div class="copyright">
+        &copy; 2016 - 2017 <a href="https://github.com/gurayyarar/AdminBSBMaterialDesign">AdminBSB - Material Design</a>.
+      </div>
+      <div class="version">
+        <b>Version: </b> 1.0.5
+      </div>
+    </div>
+    <!-- #Footer -->
+  </aside>
+  <!-- #END# Left Sidebar -->
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="header">
+            <div style="float: left; margin-right: 20px">
+              <a href="/settings"><i class="material-icons">arrow_back</i></a>
+            </div>
+            <div>
+              <h2 style="line-height: 24px">{{ agent.name }}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="header">
+            <h2>
+              Configurações de usuário
+              <small>Alterar dados da conta. Deixe em branco para não alterar.</small>
+            </h2>
+          </div>
+          <div class="body">
+            <form id="update-user-form">
+              {% csrf_token %}
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="text" id="name-field" name="name" class="form-control">
+                  <label class="form-label">Nome</label>
+                </div>
+              </div>
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="text" id="username-field" name="username" class="form-control">
+                  <label class="form-label">Usuário</label>
+                </div>
+              </div>
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="password" id="password-field" name="password" class="form-control">
+                  <label class="form-label">Senha</label>
+                </div>
+              </div>
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="password" id="confirm-password-field" name="confirm-password" class="form-control">
+                  <label class="form-label">Confirmar senha</label>
+                </div>
+              </div>
+              <div class="form-group form-float">
+                <div class="form-line">
+                  <input type="password" id="current-password-field" name="current-password" class="form-control">
+                  <label class="form-label">Senha atual</label>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-lg m-t-15 waves-effect" id="update-user-button">SALVAR</button>
+              <button type="reset" class="btn btn-primary btn-lg m-t-15 waves-effect">LIMPAR</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Jquery Core Js -->
+<script src="{% static 'adminbsb/plugins/jquery/jquery.min.js' %}"></script>
+
+<!-- Bootstrap Core Js -->
+<script src="{% static 'adminbsb/plugins/bootstrap/js/bootstrap.js' %}"></script>
+
+<!-- Slimscroll Plugin Js -->
+<script src="{% static 'adminbsb/plugins/jquery-slimscroll/jquery.slimscroll.js' %}"></script>
+
+<!-- Waves Effect Plugin Js -->
+<script src="{% static 'adminbsb/plugins/node-waves/waves.js' %}"></script>
+
+<!-- Custom Js -->
+<script src="{% static 'adminbsb/js/admin.js' %}"></script>
+
+<script src="{% static 'core/js/settings.js' %}"></script>
+</body>
+
+</html>

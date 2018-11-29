@@ -16,7 +16,7 @@ def sign_up(request):
     if 'user_id' in request.session.keys():
         return redirect('/panel')
 
-    return render(request, 'core/old/signup.html')
+    return render(request, 'core/sign-up.html')
 
 
 def panel(request):
@@ -125,9 +125,9 @@ def agent_settings(request, agent_id):
     res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
 
     if res['type'] == 0:
-        return render(request, 'core/old/agent_config.html', {'agent': res['content']['agent']})
+        return render(request, 'core/agent_settings.html', {'agent': res['content']['agent']})
     else:
-        return render(request, 'core/old/agent_config.html')
+        return redirect('/settings')
 
 
 def results(request):

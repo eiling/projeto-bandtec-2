@@ -12,10 +12,10 @@ def sign_up(request):
     name = request.POST['name']
     username = request.POST['username']
     password = request.POST['password']
-    repeat = request.POST['repeat-password']
+    confirm = request.POST['confirm']
 
     # field validations go here
-    if password != repeat:
+    if password != confirm:
         return HttpResponse(json.dumps({'status': 1}), content_type='text/JSON')
 
     res = get_manager_response({'type': 1, 'content': {
@@ -25,10 +25,8 @@ def sign_up(request):
     }})
 
     if res['type'] == 0:
-        # request.session['user_id'] = res['content']['id']  login the user?
         obj = {'status': 0}
     else:
         obj = {'status': 2}
-        print(res['content']['message'])
 
     return HttpResponse(json.dumps(obj), content_type='text/JSON')

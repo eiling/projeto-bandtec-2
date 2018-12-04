@@ -16,6 +16,9 @@
   <!-- Bootstrap Core Css -->
   <link href="{% static 'adminbsb/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
 
+  <!-- Bootstrap Select Css -->
+  <link href="{% static 'adminbsb/plugins/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet"/>
+
   <!-- Waves Effect Css -->
   <link href="{% static 'adminbsb/plugins/node-waves/waves.css' %}" rel="stylesheet"/>
 
@@ -138,45 +141,61 @@
         <div class="card">
           <div class="header">
             <h2>
-              Configurações de usuário
-              <small>Alterar dados da conta. Deixe em branco para não alterar.</small>
+              Configurações de agente
+              <small>Alterar parâmetros de monitoração. Deixe em branco para não alterar.</small>
             </h2>
           </div>
           <div class="body">
             <form id="update-user-form">
               {% csrf_token %}
+              <h2 class="card-inside-title" style="margin-top: 0">Geral</h2>
               <div class="form-group form-float">
                 <div class="form-line">
                   <input type="text" id="name-field" name="name" class="form-control">
-                  <label class="form-label">Nome</label>
+                  <label class="form-label">Nome |COLOCAR UM CARD EM CIMA PARA MOSTRAR AS CONFIGS ANTIGAS|</label>
                 </div>
               </div>
               <div class="form-group form-float">
                 <div class="form-line">
-                  <input type="text" id="username-field" name="username" class="form-control">
-                  <label class="form-label">Usuário</label>
+                  <input type="number" id="interval-field" name="interval" class="form-control">
+                  <label class="form-label">Intervalo</label>
                 </div>
               </div>
-              <div class="form-group form-float">
-                <div class="form-line">
-                  <input type="password" id="password-field" name="password" class="form-control">
-                  <label class="form-label">Senha</label>
+              <h2 class="card-inside-title" style="margin-top: 0">Recursos</h2>
+              <div class="form-group form-float row" style="margin: 0; line-height: 40px">
+                <div class="switch m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <label>
+                    <b>CPU</b>
+                    <input type="checkbox" id="processor-switch" name="monitor-processor" checked>
+                    <span class="lever switch-col-blue"></span>
+                  </label>
+                </div>
+                <div class="m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <input type="checkbox" class="filled-in chk-col-blue" id="processor-alert" name="alert-processor">
+                  <label for="processor-alert">ALERTA</label>
+                </div>
+                <div class="m-b-20" style="float: left; width: 240px; height: 40px;">
+                  <select class="js-animations form-control show-tick" name="agent-select">
+                    <option value="1">Porcentagem de uso acima de</option>
+                    <option value="2">Espaço disponível abaixo de</option>
+                  </select>
+                </div>
+                <div class="m-b-20" style="float: left; width: 50px; height: 40px;">
+                  <div class="form-line" style="height: 37px;">
+                    <input type="text" id="processor-field" name="processor" class="form-control">
+                  </div>
+                </div>
+                <div class="m-b-20" style="float: left; height: 37px; padding: 0 12px; border-bottom: 1px solid #ddd"><b>%</b></div>
+                <div class="m-b-20" style="float: left; width: 80px; height: 40px;">
+                  <select class="js-animations form-control show-tick" name="agent-select">
+                    <option value="1">KB</option>
+                    <option value="2">MB</option>
+                    <option value="3">GB</option>
+                  </select>
                 </div>
               </div>
-              <div class="form-group form-float">
-                <div class="form-line">
-                  <input type="password" id="confirm-password-field" name="confirm-password" class="form-control">
-                  <label class="form-label">Confirmar senha</label>
-                </div>
-              </div>
-              <div class="form-group form-float">
-                <div class="form-line">
-                  <input type="password" id="current-password-field" name="current-password" class="form-control">
-                  <label class="form-label">Senha atual</label>
-                </div>
-              </div>
-              <button class="btn btn-primary btn-lg m-t-15 waves-effect" id="update-user-button">SALVAR</button>
-              <button type="reset" class="btn btn-primary btn-lg m-t-15 waves-effect">LIMPAR</button>
+              <button class="btn btn-primary btn-lg waves-effect" id="update-user-button">SALVAR</button>
+              <button type="reset" class="btn btn-primary btn-lg waves-effect">LIMPAR</button>
             </form>
           </div>
         </div>
@@ -191,6 +210,9 @@
 <!-- Bootstrap Core Js -->
 <script src="{% static 'adminbsb/plugins/bootstrap/js/bootstrap.js' %}"></script>
 
+<!-- Select Plugin Js -->
+<script src="{% static 'adminbsb/plugins/bootstrap-select/js/bootstrap-select.js' %}"></script>
+
 <!-- Slimscroll Plugin Js -->
 <script src="{% static 'adminbsb/plugins/jquery-slimscroll/jquery.slimscroll.js' %}"></script>
 
@@ -200,7 +222,7 @@
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
 
-<script src="{% static 'core/js/settings.js' %}"></script>
+<script src="{% static 'core/js/agent_settings.js' %}"></script>
 </body>
 
 </html>

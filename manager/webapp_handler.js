@@ -49,7 +49,7 @@ function signUp(protocol, name, username, password) {
 }
 
 function queryLastData(protocol, userId, agentId, agents) {
-  models.Agent.findOne({
+  models.Agent.find({
     where: {
       id: agentId,
       userId: userId,
@@ -148,7 +148,7 @@ function getAgents(protocol, userId, agents) {
 }
 
 function getAgent(protocol, userId, agentId) {
-  models.Agent.findOne({
+  models.Agent.find({
     where: {
       id: agentId,
       userId: userId,
@@ -204,7 +204,7 @@ function sendPing(protocol, userId) {
 }
 
 function changeAgentParams(protocol, agentParams, userId, agents) {
-  models.Agent.findOne({
+  models.Agent.find({
     where: {
       id: agentParams.id,
       userId: userId,
@@ -431,8 +431,8 @@ function updateUser(protocol, userId, currentPassword, params) {
   });
 }
 
-function getAgentRecords(protocol, userId, agentId, beginDate, endDate){
-  models.Agent.findOne({
+function getAgentRecords(protocol, userId, agentId, beginDate, endDate) {
+  models.Agent.find({
     where: {
       id: agentId,
       userId: userId,
@@ -456,6 +456,17 @@ function getAgentRecords(protocol, userId, agentId, beginDate, endDate){
   });
 }
 
+function getLastAlerts(protocol, userId, agentId) {
+  models.Agent.find({
+    where: {
+      id: agentId,
+      userId: userId,
+    }
+  }).then(agent => {
+    // SELECT TOP 5 FROM alerts WHERE agentId = agentId ORDER BY beginTime DESC
+  });
+}
+
 module.exports = {
   authenticateUser,
   signUp,
@@ -471,4 +482,5 @@ module.exports = {
   getUser,
   updateUser,
   getAgentRecords,
+  getLastAlerts,
 };

@@ -106,6 +106,10 @@ models.sequelize.sync({force: false}).then(() => {
           WebappHandler.getAgentRecords(this, content.userId, content.agentId, content.beginDate, content.endDate);
           break;
 
+        case 14:
+          WebappHandler.getLastAlerts(this, content.userId, content.agentId);
+          break;
+
         default:
           console.log('unknown message type');
           break;

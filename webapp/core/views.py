@@ -108,6 +108,11 @@ def agent_panel(request, agent_id):
         context['agent_name'] = res['content']['agent']['name']
         context['agent_id'] = res['content']['agent']['id']
 
+    res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        pass
+
     res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
 
     if res['type'] == 0:
@@ -198,7 +203,7 @@ def main_page(request):
 
 
 def test(request):
-    return render(request, 'core/settings.html')
+    return render(request, 'core/agent_settings.html')
 
 
 def ajax_test(request):

@@ -129,8 +129,17 @@ def agent_settings(request, agent_id):
 
     res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
 
+    context = {'agent': res['content']['agent']}
+
+    res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
+
     if res['type'] == 0:
-        return render(request, 'core/agent_settings.html', {'agent': res['content']['agent']})
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    if res['type'] == 0:
+        return render(request, 'core/agent_settings.html', context)
     else:
         return redirect('/settings')
 
@@ -203,7 +212,18 @@ def main_page(request):
 
 
 def test(request):
-    return render(request, 'core/agent_settings.html')
+    res = get_manager_response({'type': 5, 'content': {'agentId': 20, 'userId': 2}})
+
+    context = {'agent': res['content']['agent']}
+
+    res = get_manager_response({'type': 11, 'content': {'userId': 2}})
+
+    if res['type'] == 0:
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    return render(request, 'core/agent_settings.html', context)
 
 
 def ajax_test(request):

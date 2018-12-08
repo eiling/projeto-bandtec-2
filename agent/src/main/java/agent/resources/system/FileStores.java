@@ -1,4 +1,4 @@
-package agent.system;
+package agent.resources.system;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

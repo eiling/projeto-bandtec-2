@@ -1,11 +1,11 @@
 package agent;
 
-import agent.system.FileStores;
-import agent.hardware.Memory;
-import agent.hardware.Processor;
+import agent.resources.system.FileStores;
+import agent.resources.hardware.Memory;
+import agent.resources.hardware.Processor;
 import org.json.*;
 import oshi.SystemInfo;
-import util.protocol.Protocol;
+import agent.util.protocol.Protocol;
 
 import java.io.*;
 import java.net.Socket;

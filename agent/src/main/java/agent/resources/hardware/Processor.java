@@ -1,4 +1,4 @@
-package agent.hardware;
+package agent.resources.hardware;
 
 import org.json.JSONObject;
 import oshi.SystemInfo;

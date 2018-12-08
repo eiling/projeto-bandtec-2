@@ -1,5 +1,4 @@
-import agent.Agent;
-import agent.Logger;
+package agent;
 
 import java.io.IOException;
 import java.util.Scanner;

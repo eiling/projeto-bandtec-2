@@ -1,9 +1,11 @@
 plugins {
     id 'java'
     id 'application'
+    id "org.beryx.jlink" version "2.1.8-gradle4"
+    id "org.javamodularity.moduleplugin" version "1.1.1"
 }
 
-mainClassName = 'Main'
+mainClassName = 'agent/agent.Main'
 
 targetCompatibility = 11
 sourceCompatibility = 11
@@ -22,4 +24,15 @@ repositories {
 
 run {
     standardInput = System.in
+}
+
+jlink {
+    mergedModule {
+        requires 'java.naming'
+        requires 'java.xml'
+        requires 'java.management'
+    }
+    launcher {
+        name = 'agent'
+    }
 }

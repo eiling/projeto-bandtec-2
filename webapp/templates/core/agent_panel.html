@@ -275,9 +275,16 @@
         <div class="card">
           <div class="header">
             <h2>Alertas recentes</h2>
+            <ul class="header-dropdown">
+              <li>
+                <div id="alert-refresh" style="cursor: pointer">
+                  <i class="material-icons">loop</i>
+                </div>
+              </li>
+            </ul>
           </div>
           <div class="body table-responsive">
-            <table class="table">
+            <table class="table" id="alert-table" hidden>
               <thead>
               <tr>
                 <th>Recurso</th>
@@ -285,11 +292,9 @@
                 <th>Período</th>
               </tr>
               </thead>
-              <tbody>
-              {% for row in alert_table %}
-              {% endfor %}
-              </tbody>
+              <tbody id="alert-table-body"></tbody>
             </table>
+            <p id="no-alerts" style="margin-bottom: 0">Nada para mostrar.
           </div>
         </div>
       </div>

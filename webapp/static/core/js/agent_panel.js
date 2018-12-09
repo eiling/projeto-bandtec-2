@@ -134,6 +134,92 @@ setInterval(() => {
   req.send();
 }, ajaxInterval);
 
+const alertRefresh = document.getElementById('alert-refresh');
+const alertTable = document.getElementById('alert-table');
+const alertTableBody = document.getElementById('alert-table-body');
+const noAlerts = document.getElementById('no-alerts');
+
+let handlingRefreshRequest = false;
+
+const getAlerts = () => {
+  if (handlingRefreshRequest) {
+    return;
+  }
+  handlingRefreshRequest = true;
+
+  let refreshRequestDone = false;
+
+  const req = new XMLHttpRequest();
+  req.onreadystatechange = () => {
+    if (req.readyState === 4 && req.status === 200) {
+      if (refreshRequestDone) {
+        return;
+      }
+      refreshRequestDone = true;
+
+      const obj = JSON.parse(req.responseText);
+
+      if (obj.status === 0) {
+        const alerts = obj.content.alerts;
+
+        if (alerts.length > 0) {
+          alertTableBody.innerHTML = '';
+
+          for (const e of alerts) {
+            const tr = document.createElement('tr');
+            const resource = document.createElement('td');
+            const threshold = document.createElement('td');
+            const period = document.createElement('td');
+
+            if (e.resource === 'CPU') {
+              resource.innerText = 'CPU';
+            } else if (e.resource === 'MEMORY') {
+              resource.innerText = 'Memória';
+            } else if (e.resource === 'DISK') {
+              resource.innerText = 'Disco';
+            } else {
+              resource.innerText = 'ERRO'
+            }
+
+            if (e.threshold.type === 0) {
+              threshold.innerText = formatBytes(e.threshold.value);
+            } else {
+              threshold.innerText = `${e.threshold.value}%`
+            }
+
+            period.innerText =
+              `${new Date(e.begin).toLocaleString('pt-BR')} à ${new Date(e.end).toLocaleString('pt-BR')}`;
+
+            tr.appendChild(resource);
+            tr.appendChild(threshold);
+            tr.appendChild(period);
+
+            alertTableBody.appendChild(tr);
+          }
+
+          alertTable.hidden = false;
+          noAlerts.hidden = true;
+        } else {
+          alertTable.hidden = true;
+          noAlerts.hidden = false;
+        }
+
+      } else {
+        alert('Erro ao atualizar tabela de alertas');
+      }
+
+      handlingRefreshRequest = false;
+    }
+  };
+
+  req.open('GET', '/ajax/query_alerts?id=' + agentId, true);
+  req.send();
+};
+
+alertRefresh.onclick = getAlerts;
+
+getAlerts();
+
 $(function () {
   $('[data-toggle="popover"]').popover();
 });

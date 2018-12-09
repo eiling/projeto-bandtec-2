@@ -463,7 +463,49 @@ function getLastAlerts(protocol, userId, agentId) {
       userId: userId,
     }
   }).then(agent => {
-    // SELECT TOP 5 FROM alerts WHERE agentId = agentId ORDER BY beginTime DESC
+    if (agent) {
+      const date = new Date();
+      date.setDate(date.getDate() - 7);
+
+      models.Alert.findAll({
+        where: {
+          agentId: agent.id,
+          endTime: {
+            [models.Op.gte]: date.toISOString(),
+          }
+        },
+        order: [['endTime', 'DESC']],
+        limit: 5,
+      }).then(alerts => {
+        protocol.send({
+          type: 0,
+          content: {
+            alerts: alerts,
+          },
+        });
+      }).catch(err => {
+        protocol.send({
+          type: 3,
+          content: {
+            message: err.toString(),
+          },
+        });
+      });
+    } else {
+      protocol.send({
+        type: 1,
+        content: {
+          message: 'Agent not found',
+        },
+      });
+    }
+  }).catch(err => {
+    protocol.send({
+      type: 2,
+      content: {
+        message: err.toString(),
+      },
+    });
   });
 }
 

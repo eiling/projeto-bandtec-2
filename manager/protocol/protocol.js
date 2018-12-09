@@ -110,7 +110,7 @@ Protocol.prototype.send = function(message) {
   const length = buffer.length;
 
   if (length > 65535) {
-    throw new Error('Message maximum length is 65535.')
+    throw new Error('Message maximum length is 65535.');
   }
 
   this.header_(buffer.length);

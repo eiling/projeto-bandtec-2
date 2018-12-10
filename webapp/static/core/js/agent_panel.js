@@ -188,7 +188,7 @@ const getAlerts = () => {
             }
 
             period.innerText =
-              `${new Date(e.begin).toLocaleString('pt-BR')} à ${new Date(e.end).toLocaleString('pt-BR')}`;
+              `${new Date(e.begin).toLocaleString('pt-BR')} a ${new Date(e.end).toLocaleString('pt-BR')}`;
 
             tr.appendChild(resource);
             tr.appendChild(threshold);

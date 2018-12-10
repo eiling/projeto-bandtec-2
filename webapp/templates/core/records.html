@@ -16,6 +16,9 @@
   <!-- Bootstrap Core Css -->
   <link href="{% static 'adminbsb/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
 
+  <!-- Bootstrap DatePicker Css -->
+  <link href="{% static 'adminbsb/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css' %}" rel="stylesheet"/>
+
   <!-- Bootstrap Select Css -->
   <link href="{% static 'adminbsb/plugins/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet"/>
 
@@ -140,35 +143,26 @@
             <form action="/results" method="get">
               <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <select class="js-animations form-control show-tick" name="agent-select">
-                    <optgroup label="Agentes">
-                      {% if agents %}
-                        {% for agent in agents %}
-                          <option value="{{ agent.id }}">{{ agent.name }}</option>
-                        {% endfor %}
-                      {% endif %}
-                    </optgroup>
+                  <select class="js-animations form-control show-tick" name="agent">
+                  <option value="-1">-- Selecione o agente --</option>
+                    {% if agents %}
+                      {% for agent in agents %}
+                        <option value="{{ agent.id }}">{{ agent.name }}</option>
+                      {% endfor %}
+                    {% endif %}
                   </select>
                 </div>
               </div>
               <div class="row clearfix">
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 0">
-                  <div class="input-group">
-                    <span class="input-group-addon custom-label">
-                      <label for="begin-date-field">Início do período:</label>
-                    </span>
+                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                  <div class="input-daterange input-group" id="bs_datepicker_range_container">
+                    <span class="input-group-addon">Período:</span>
                     <div class="form-line">
-                      <input type="date" class="form-control date" name="begin-date" id="begin-date-field">
+                      <input type="text" class="form-control" placeholder="Data de início" name="begin-date">
                     </div>
-                  </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 0">
-                  <div class="input-group">
-                    <span class="input-group-addon custom-label">
-                      <label for="end-date-field">Fim do período:</label>
-                    </span>
+                    <span class="input-group-addon">a</span>
                     <div class="form-line">
-                      <input type="date" class="form-control date" name="end-date" id="end-date-field">
+                      <input type="text" class="form-control" placeholder="Data de término" name="end-date">
                     </div>
                   </div>
                 </div>
@@ -203,8 +197,13 @@
 <!-- Waves Effect Plugin Js -->
 <script src="{% static 'adminbsb/plugins/node-waves/waves.js' %}"></script>
 
+<!-- Bootstrap Datepicker Plugin Js -->
+<script src="{% static 'adminbsb/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
+
+<script src="{% static 'core/js/records.js' %}"></script>
 </body>
 
 </html>

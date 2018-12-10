@@ -148,6 +148,9 @@ def results(request):
     if 'user_id' not in request.session.keys():
         return redirect('/')
 
+    if request.GET['agent'] == '-1':
+        return redirect('/records')
+
     context = {
         'begin_date': request.GET['begin-date'],
         'end_date': request.GET['end-date'],
@@ -155,7 +158,7 @@ def results(request):
 
     res = get_manager_response({'type': 13, 'content': {
         'userId': request.session['user_id'],
-        'agentId': request.GET['agent-select'],
+        'agentId': request.GET['agent'],
         'beginDate': request.GET['begin-date'],
         'endDate': request.GET['end-date'],
     }})

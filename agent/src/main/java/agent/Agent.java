@@ -17,7 +17,7 @@ public class Agent implements AutoCloseable {
   private boolean loggedIn;
 
   public Agent() throws IOException {
-    socket = new Socket("localhost", 9000);
+    socket = new Socket("35.237.245.135", 9000);
     protocol = new Protocol(socket);
   }
 

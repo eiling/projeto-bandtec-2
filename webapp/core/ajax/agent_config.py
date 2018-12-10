@@ -113,7 +113,7 @@ def change_agent(request):
                 'memory': memory,
                 'disk': disk,
             },
-            'userId': 2,
+            'userId': request.session['user_id'],
         },
     })
 
@@ -136,8 +136,7 @@ def remove_agent(request):
     res = get_manager_response({
         'type': 8,
         'content': {
-            # 'userId': request.session['user_id'],
-            'userId': 2,
+            'userId': request.session['user_id'],
             'agentId': agent_id,
         },
     })

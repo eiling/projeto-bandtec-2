@@ -220,26 +220,81 @@
             <div class="tab-content">
               {% if data.processor %}
                 <div role="tabpanel" class="tab-pane fade in active" id="processor-chart">
-                  <div style="height: 300px; background-color: grey"></div>
+                  <div>
+                    <div class="pull-left">Porcentagem de uso</div>
+                    <div class="pull-right">100%</div>
+                  </div>
+                  <br>
+                  <div id="processor-chart-placeholder"></div>
+                  <div>
+                    <div class="pull-left">60 segundos</div>
+                    <div class="pull-right">0</div>
+                  </div>
+                  <br>
                 </div>
               {% endif %}
               {% if data.memory %}
-                <div role="tabpanel" class="tab-pane fade{% if not data.processor %} in active{% endif %}"
-                     id="memory-chart">
-                  <div style="height: 300px; background-color: grey"></div>
+                <div role="tabpanel" class="tab-pane fade in active" id="memory-chart">
+                  <div>
+                    <div class="pull-left">Porcentagem de uso</div>
+                    <div class="pull-right">100%</div>
+                  </div>
+                  <br>
+                  <div id="memory-chart-placeholder"></div>
+                  <div>
+                    <div class="pull-left">60 segundos</div>
+                    <div class="pull-right">0</div>
+                  </div>
+                  <br>
                 </div>
               {% endif %}
               {% if data.fileStores %}
                 {% for partition in data.fileStores %}
-                  <div role="tabpanel"
-                       class="tab-pane fade
-                           {% if not data.processor and not data.memory %}{% if forloop.first %} in active{% endif %}{% endif %}"
-                       id="partition-{{ forloop.counter0 }}-chart">
-                    <div style="height: 300px; background-color: grey"></div>
+                  <div role="tabpanel" class="tab-pane fade in active" id="partition-{{ forloop.counter0 }}-chart">
+                    <div>
+                      <div class="pull-left">Porcentagem de uso</div>
+                      <div class="pull-right">100%</div>
+                    </div>
+                    <br>
+                    <div id="partition-{{ forloop.counter0 }}-chart-placeholder"></div>
+                    <div>
+                      <div class="pull-left">60 segundos</div>
+                      <div class="pull-right">0</div>
+                    </div>
+                    <br>
                   </div>
                 {% endfor %}
               {% endif %}
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="header">
+            <h2>Últimos alertas</h2>
+            <ul class="header-dropdown">
+              <li>
+                <div id="alert-refresh" style="cursor: pointer">
+                  <i class="material-icons">loop</i>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="body table-responsive">
+            <table class="table" id="alert-table" hidden>
+              <thead>
+              <tr>
+                <th>Recurso</th>
+                <th>Limiar</th>
+                <th>Período</th>
+              </tr>
+              </thead>
+              <tbody id="alert-table-body"></tbody>
+            </table>
+            <p id="no-alerts" style="margin-bottom: 0">Nada para mostrar.
           </div>
         </div>
       </div>
@@ -264,26 +319,87 @@
 <!-- Waves Effect Plugin Js -->
 <script src="{% static 'adminbsb/plugins/node-waves/waves.js' %}"></script>
 
+<!-- Flot Chart Plugins Js -->
+<script src="{% static 'adminbsb/plugins/flot-charts/jquery.flot.js' %}"></script>
+<script src="{% static 'adminbsb/plugins/flot-charts/jquery.flot.resize.js' %}"></script>
+
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
 
 <script src="{% static 'core/js/format_bytes.js' %}"></script>
 <!-- Initialization script -->
 <script>
+  const heightRatio = .4;
+  const flotOptions = {
+    series: {
+      shadowSize: 0,
+      color: 'rgb(33,150,243)',
+    },
+    grid: {
+      borderColor: '#000000',
+      borderWidth: 2,
+      tickColor: '#000000',
+    },
+    lines: {
+      fill: true,
+    },
+    yaxis: {
+      min: 0,
+      max: 100,
+      ticks: [10, 20, 30, 40, 50, 60, 70, 80, 90],
+      tickFormatter: () => '',
+    },
+    xaxis: {
+      min: 0,
+      max: 59,
+      ticks: [10, 20, 30, 40, 50],
+      tickFormatter: () => '',
+    },
+  };
+
   {% if data.processor %}
     document.getElementById('processor-box').innerText =
-        `${parseFloat(parseFloat({{ data.processor.systemCpuLoad }}) * 100).toFixed(1)}%`;
+      `${parseFloat(parseFloat({{ data.processor.systemCpuLoad }}) * 100).toFixed(1)}%`;
     document.getElementById('processor-popover')
-        .setAttribute('data-content', '{{ data.processor.name }}');
+      .setAttribute('data-content', '{{ data.processor.name }}');
+
+    {
+      const div = $('#processor-chart-placeholder');
+      div.css('height', div.width() * heightRatio);
+    }
+
+    $(window).resize(() => {
+      const div = $('#processor-chart-placeholder');
+      div.css('height', div.width() * heightRatio);
+    });
+
+    const processorData = [];
+    const processorPlot = $.plot('#processor-chart-placeholder', [[]], flotOptions);
   {% endif %}
   {% if data.memory %}
     const a = parseFloat({{ data.memory.available }});
     const t = parseFloat({{ data.memory.total }});
     document.getElementById('memory-box').innerText = `${parseFloat(100 - (a * 100 / t)).toFixed(1)}%`;
     document.getElementById('memory-popover')
-        .setAttribute('data-content', formatBytes(a) + ' (disponível) / ' + formatBytes(t) + ' (total)');
+      .setAttribute('data-content', formatBytes(a) + ' (disponível) / ' + formatBytes(t) + ' (total)');
+
+    {
+      const div = $('#memory-chart-placeholder');
+      div.css('height', div.width() * heightRatio);
+    }
+
+    $(window).resize(() => {
+      const div = $('#memory-chart-placeholder');
+      div.css('height', div.width() * heightRatio);
+    });
+
+    const memoryData = [];
+    const memoryPlot = $.plot('#memory-chart-placeholder', [[]], flotOptions);
   {% endif %}
   {% if data.fileStores %}
+    const partitionData = [];
+    const partitionPlot = [];
+
     {% for partition in data.fileStores %}
       {
         const m = parseInt({{ forloop.counter0 }});
@@ -291,10 +407,28 @@
         const t = parseFloat({{ partition.totalSpace }});
         document.getElementById(`partition-${m}-box`).innerText = `${parseFloat(100 - (a * 100 / t)).toFixed(1)}%`;
         document.getElementById(`partition-${m}-popover`)
-            .setAttribute('data-content', formatBytes(a) + ' (disponível) / ' + formatBytes(t) + ' (total)');
+          .setAttribute('data-content', formatBytes(a) + ' (disponível) / ' + formatBytes(t) + ' (total)');
+
+        {
+          const div = $(`#partition-${m}-chart-placeholder`);
+          div.css('height', div.width() * heightRatio);
+        }
+
+        $(window).resize(() => {
+          const div = $(`#partition-${m}-chart-placeholder`);
+          div.css('height', div.width() * heightRatio);
+        });
+
+        partitionData.push([]);
+        partitionPlot.push($.plot(`#partition-${m}-chart-placeholder`, [[]], flotOptions))
       }
     {% endfor %}
   {% endif %}
+
+  const tabList = document.getElementsByClassName('tab-pane');
+  for (let i = 1; i < tabList.length; i++) {
+    tabList[i].classList.remove('active');
+  }
 </script>
 <script src="{% static 'core/js/agent_panel.js' %}"></script>
 </body>

@@ -2,6 +2,8 @@
 
 const sequelize = require('../secrets/connection');
 
+const Op = require('sequelize').Op;
+
 const User = sequelize.import(__dirname + '\\models\\user.js');
 const Agent = sequelize.import(__dirname + '\\models\\agent.js');
 const Alert = sequelize.import(__dirname + '\\models\\alert.js');
@@ -23,4 +25,5 @@ module.exports = {
   ProcessorData,
   MemoryData,
   FileStoreData,
+  Op,
 };

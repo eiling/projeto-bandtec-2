@@ -108,6 +108,11 @@ def agent_panel(request, agent_id):
         context['agent_name'] = res['content']['agent']['name']
         context['agent_id'] = res['content']['agent']['id']
 
+    res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
+
+    if res['type'] == 0:
+        pass
+
     res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
 
     if res['type'] == 0:
@@ -124,8 +129,17 @@ def agent_settings(request, agent_id):
 
     res = get_manager_response({'type': 5, 'content': {'agentId': agent_id, 'userId': request.session['user_id']}})
 
+    context = {'agent': res['content']['agent']}
+
+    res = get_manager_response({'type': 11, 'content': {'userId': request.session['user_id']}})
+
     if res['type'] == 0:
-        return render(request, 'core/agent_settings.html', {'agent': res['content']['agent']})
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    if res['type'] == 0:
+        return render(request, 'core/agent_settings.html', context)
     else:
         return redirect('/settings')
 
@@ -134,6 +148,9 @@ def results(request):
     if 'user_id' not in request.session.keys():
         return redirect('/')
 
+    if request.GET['agent'] == '-1':
+        return redirect('/records')
+
     context = {
         'begin_date': request.GET['begin-date'],
         'end_date': request.GET['end-date'],
@@ -141,7 +158,7 @@ def results(request):
 
     res = get_manager_response({'type': 13, 'content': {
         'userId': request.session['user_id'],
-        'agentId': request.GET['agent-select'],
+        'agentId': request.GET['agent'],
         'beginDate': request.GET['begin-date'],
         'endDate': request.GET['end-date'],
     }})
@@ -198,7 +215,18 @@ def main_page(request):
 
 
 def test(request):
-    return render(request, 'core/settings.html')
+    res = get_manager_response({'type': 5, 'content': {'agentId': 20, 'userId': 2}})
+
+    context = {'agent': res['content']['agent']}
+
+    res = get_manager_response({'type': 11, 'content': {'userId': 2}})
+
+    if res['type'] == 0:
+        context['name'] = res['content']['user']['name']
+    else:
+        context['name'] = 'usuário'
+
+    return render(request, 'core/agent_settings.html', context)
 
 
 def ajax_test(request):

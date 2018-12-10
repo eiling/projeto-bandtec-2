@@ -16,6 +16,9 @@
   <!-- Bootstrap Core Css -->
   <link href="{% static 'adminbsb/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
 
+  <!-- Bootstrap Select Css -->
+  <link href="{% static 'adminbsb/plugins/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet"/>
+
   <!-- Waves Effect Css -->
   <link href="{% static 'adminbsb/plugins/node-waves/waves.css' %}" rel="stylesheet"/>
 
@@ -138,45 +141,149 @@
         <div class="card">
           <div class="header">
             <h2>
-              Configurações de usuário
-              <small>Alterar dados da conta. Deixe em branco para não alterar.</small>
+              Configurações de agente
+              <small>Alterar parâmetros de monitoração. Deixe em branco para não alterar.</small>
             </h2>
           </div>
           <div class="body">
-            <form id="update-user-form">
+            <form id="update-agent-form">
               {% csrf_token %}
-              <div class="form-group form-float">
-                <div class="form-line">
-                  <input type="text" id="name-field" name="name" class="form-control">
-                  <label class="form-label">Nome</label>
+              <input name="agent-id" value="{{ agent.id }}" hidden>
+              <h2 class="card-inside-title" style="margin-top: 0">Geral</h2>
+              <div class="form-group form-float row" style="margin: 0; line-height: 40px">
+                <div class="switch m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <b style="padding-right: 18px">Nome:</b>
+                </div>
+                <div class="m-b-20" style="float: left; height: 40px;">
+                  <div class="form-line" style="height: 37px;">
+                    <input type="text" id="name-field" name="name" class="form-control" placeholder="{{ agent.name }}">
+                  </div>
                 </div>
               </div>
-              <div class="form-group form-float">
-                <div class="form-line">
-                  <input type="text" id="username-field" name="username" class="form-control">
-                  <label class="form-label">Usuário</label>
+              <div class="form-group form-float row" style="margin: 0; line-height: 40px">
+                <div class="switch m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <b>Intervalo:</b>
+                </div>
+                <div class="m-b-20" style="float: left; width: 50px; height: 40px;">
+                  <div class="form-line" style="height: 37px;">
+                    <input type="text" id="interval-field" name="interval" class="form-control"
+                           style="text-align: right">
+                  </div>
+                </div>
+                <div class="m-b-20" style="float: left; width: 120px; height: 40px;">
+                  <select id="interval-select" class="js-animations form-control show-tick" name="interval-unit-select">
+                    <option value="1">segundos</option>
+                    <option value="2">minutos</option>
+                    <option value="3">horas</option>
+                  </select>
                 </div>
               </div>
-              <div class="form-group form-float">
-                <div class="form-line">
-                  <input type="password" id="password-field" name="password" class="form-control">
-                  <label class="form-label">Senha</label>
+              <h2 class="card-inside-title" style="margin-top: 0">Recursos</h2>
+              <div class="form-group form-float row" style="margin: 0; line-height: 40px">
+                <div class="switch m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <label>
+                    <b style="padding-right: 26px">CPU</b>
+                    <input type="checkbox" id="processor-switch" name="monitor-processor" checked>
+                    <span class="lever switch-col-blue"></span>
+                  </label>
+                </div>
+                <div id="processor-alert-div" class="m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <input type="checkbox" class="filled-in chk-col-blue" id="processor-alert" name="alert-processor">
+                  <label for="processor-alert">ALERTA</label>
+                </div>
+                <div id="processor-select-div" class="m-b-20" style="float: left; width: 240px; height: 40px;" hidden>
+                  <select class="js-animations form-control show-tick" disabled>
+                    <option value="1">Porcentagem de uso acima de</option>
+                  </select>
+                </div>
+                <div id="processor-field-div" class="m-b-20" style="float: left; width: 50px; height: 40px;" hidden>
+                  <div class="form-line" style="height: 37px;">
+                    <input type="text" id="processor-field" name="processor" class="form-control" placeholder="valor"
+                           style="text-align: right">
+                  </div>
+                </div>
+                <div id="processor-percentage" class="m-b-20"
+                     style="float: left; height: 37px; padding: 0 12px; border-bottom: 1px solid #ddd" hidden>
+                  <b>%</b></div>
+              </div>
+              <div class="form-group form-float row" style="margin: 0; line-height: 40px">
+                <div class="switch m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <label>
+                    <b>Memória</b>
+                    <input type="checkbox" id="memory-switch" name="monitor-memory" checked>
+                    <span class="lever switch-col-blue"></span>
+                  </label>
+                </div>
+                <div id="memory-alert-div" class="m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <input type="checkbox" class="filled-in chk-col-blue" id="memory-alert" name="alert-memory">
+                  <label for="memory-alert">ALERTA</label>
+                </div>
+                <div id="memory-select-div" class="m-b-20" style="float: left; width: 240px; height: 40px;" hidden>
+                  <select class="js-animations form-control show-tick" id="memory-select" name="memory-select">
+                    <option value="1">Porcentagem de uso acima de</option>
+                    <option value="2">Espaço disponível abaixo de</option>
+                  </select>
+                </div>
+                <div id="memory-field-div" class="m-b-20" style="float: left; width: 50px; height: 40px;" hidden>
+                  <div class="form-line" style="height: 37px;">
+                    <input type="text" id="memory-field" name="memory" class="form-control" placeholder="valor"
+                           style="text-align: right">
+                  </div>
+                </div>
+                <div id="memory-percentage" class="m-b-20"
+                     style="float: left; height: 37px; padding: 0 12px; border-bottom: 1px solid #ddd" hidden>
+                  <b>%</b></div>
+                <div id="memory-unit-div" class="m-b-20" style="float: left; width: 80px; height: 40px;" hidden>
+                  <select class="js-animations form-control show-tick" id="memory-unit-select"
+                          name="memory-unit-select">
+                    <option value="1">KB</option>
+                    <option value="2">MB</option>
+                    <option value="3">GB</option>
+                  </select>
                 </div>
               </div>
-              <div class="form-group form-float">
-                <div class="form-line">
-                  <input type="password" id="confirm-password-field" name="confirm-password" class="form-control">
-                  <label class="form-label">Confirmar senha</label>
+              <div class="form-group form-float row" style="margin: 0; line-height: 40px">
+                <div class="switch m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <label>
+                    <b style="padding-right: 12px">Discos</b>
+                    <input type="checkbox" id="disk-switch" name="monitor-disk" checked>
+                    <span class="lever switch-col-blue"></span>
+                  </label>
+                </div>
+                <div id="disk-alert-div" class="m-r-20 m-b-20" style="float: left; height: 40px;">
+                  <input type="checkbox" class="filled-in chk-col-blue" id="disk-alert" name="alert-disk">
+                  <label for="disk-alert">ALERTA</label>
+                </div>
+                <div id="disk-select-div" class="m-b-20" style="float: left; width: 240px; height: 40px;" hidden>
+                  <select class="js-animations form-control show-tick" id="disk-select" name="disk-select">
+                    <option value="1">Porcentagem de uso acima de</option>
+                    <option value="2">Espaço disponível abaixo de</option>
+                  </select>
+                </div>
+                <div id="disk-field-div" class="m-b-20" style="float: left; width: 50px; height: 40px;" hidden>
+                  <div class="form-line" style="height: 37px;">
+                    <input type="text" id="disk-field" name="disk" class="form-control" placeholder="valor"
+                           style="text-align: right">
+                  </div>
+                </div>
+                <div id="disk-percentage" class="m-b-20"
+                     style="float: left; height: 37px; padding: 0 12px; border-bottom: 1px solid #ddd" hidden>
+                  <b>%</b></div>
+                <div id="disk-unit-div" class="m-b-20" style="float: left; width: 80px; height: 40px;" hidden>
+                  <select class="js-animations form-control show-tick" id="disk-unit-select" name="disk-unit-select">
+                    <option value="1">KB</option>
+                    <option value="2">MB</option>
+                    <option value="3">GB</option>
+                  </select>
                 </div>
               </div>
-              <div class="form-group form-float">
-                <div class="form-line">
-                  <input type="password" id="current-password-field" name="current-password" class="form-control">
-                  <label class="form-label">Senha atual</label>
-                </div>
-              </div>
-              <button class="btn btn-primary btn-lg m-t-15 waves-effect" id="update-user-button">SALVAR</button>
-              <button type="reset" class="btn btn-primary btn-lg m-t-15 waves-effect">LIMPAR</button>
+              <button class="btn btn-primary btn-lg waves-effect" id="update-agent-button">SALVAR</button>
+              <button type="reset" class="btn btn-primary btn-lg waves-effect">LIMPAR</button>
+              <button type="button" class="btn btn-danger btn-lg waves-effect" id="remove-agent-button">REMOVER</button>
+            </form>
+            <form id="remove-agent-form" hidden>
+              {% csrf_token %}
+              <input name="agent-id" value="{{ agent.id }}">
             </form>
           </div>
         </div>
@@ -185,11 +292,19 @@
   </div>
 </section>
 
+<span id="old-interval" hidden>{{ agent.interval }}</span>
+<span id="old-cpu" hidden>{{ agent.cpu }}</span>
+<span id="old-memory" hidden>{{ agent.memory }}</span>
+<span id="old-disk" hidden>{{ agent.disk }}</span>
+
 <!-- Jquery Core Js -->
 <script src="{% static 'adminbsb/plugins/jquery/jquery.min.js' %}"></script>
 
 <!-- Bootstrap Core Js -->
 <script src="{% static 'adminbsb/plugins/bootstrap/js/bootstrap.js' %}"></script>
+
+<!-- Select Plugin Js -->
+<script src="{% static 'adminbsb/plugins/bootstrap-select/js/bootstrap-select.js' %}"></script>
 
 <!-- Slimscroll Plugin Js -->
 <script src="{% static 'adminbsb/plugins/jquery-slimscroll/jquery.slimscroll.js' %}"></script>
@@ -200,7 +315,7 @@
 <!-- Custom Js -->
 <script src="{% static 'adminbsb/js/admin.js' %}"></script>
 
-<script src="{% static 'core/js/settings.js' %}"></script>
+<script src="{% static 'core/js/agent_settings.js' %}"></script>
 </body>
 
 </html>

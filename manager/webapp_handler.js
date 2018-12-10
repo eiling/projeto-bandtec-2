@@ -49,7 +49,7 @@ function signUp(protocol, name, username, password) {
 }
 
 function queryLastData(protocol, userId, agentId, agents) {
-  models.Agent.findOne({
+  models.Agent.find({
     where: {
       id: agentId,
       userId: userId,
@@ -148,7 +148,7 @@ function getAgents(protocol, userId, agents) {
 }
 
 function getAgent(protocol, userId, agentId) {
-  models.Agent.findOne({
+  models.Agent.find({
     where: {
       id: agentId,
       userId: userId,
@@ -204,7 +204,7 @@ function sendPing(protocol, userId) {
 }
 
 function changeAgentParams(protocol, agentParams, userId, agents) {
-  models.Agent.findOne({
+  models.Agent.find({
     where: {
       id: agentParams.id,
       userId: userId,
@@ -431,8 +431,8 @@ function updateUser(protocol, userId, currentPassword, params) {
   });
 }
 
-function getAgentRecords(protocol, userId, agentId, beginDate, endDate){
-  models.Agent.findOne({
+function getAgentRecords(protocol, userId, agentId, beginDate, endDate) {
+  models.Agent.find({
     where: {
       id: agentId,
       userId: userId,
@@ -456,6 +456,59 @@ function getAgentRecords(protocol, userId, agentId, beginDate, endDate){
   });
 }
 
+function getLastAlerts(protocol, userId, agentId) {
+  models.Agent.find({
+    where: {
+      id: agentId,
+      userId: userId,
+    }
+  }).then(agent => {
+    if (agent) {
+      const date = new Date();
+      date.setDate(date.getDate() - 7);
+
+      models.Alert.findAll({
+        where: {
+          agentId: agent.id,
+          endTime: {
+            [models.Op.gte]: date.toISOString(),
+          }
+        },
+        order: [['endTime', 'DESC']],
+        limit: 5,
+      }).then(alerts => {
+        protocol.send({
+          type: 0,
+          content: {
+            alerts: alerts,
+          },
+        });
+      }).catch(err => {
+        protocol.send({
+          type: 3,
+          content: {
+            message: err.toString(),
+          },
+        });
+      });
+    } else {
+      protocol.send({
+        type: 1,
+        content: {
+          message: 'Agent not found',
+        },
+      });
+    }
+  }).catch(err => {
+    protocol.send({
+      type: 2,
+      content: {
+        message: err.toString(),
+      },
+    });
+  });
+}
+
 module.exports = {
   authenticateUser,
   signUp,
@@ -471,4 +524,5 @@ module.exports = {
   getUser,
   updateUser,
   getAgentRecords,
+  getLastAlerts,
 };

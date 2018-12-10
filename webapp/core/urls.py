@@ -19,6 +19,7 @@ urlpatterns = [
     path('ajax/sign_up', ajax.sign_up),
     path('ajax/setup_dm', ajax.setup_discord_dm),
     path('ajax/query_data', ajax.query_last_data),
+    path('ajax/query_alerts', ajax.query_last_alerts),
     path('ajax/ping', ajax.ping),
     path('ajax/change_agent', ajax.change_agent),
     path('ajax/remove_agent', ajax.remove_agent),

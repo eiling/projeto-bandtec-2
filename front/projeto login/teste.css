@@ -1,0 +1,38 @@
+.center {
+    width: 100%;
+    height: 100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form{
+    margin: 0;
+    position: absolute;
+}
+
+.no-outline{
+    outline: none;
+}
+
+
+#btnentrar{
+    background:rgb(224,64,251);
+    color:white;
+}
+
+#btncadas{
+  margin-left: 68px;
+  background:#795548;
+  color:white;
+}
+
+#grafico{
+        margin:auto;
+        border:1px solid #000;
+        background-color:pink;
+        border:1px solid #CCC;
+    }
+
+
+

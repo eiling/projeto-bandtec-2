@@ -1,0 +1,40 @@
+<! DOCTYPE html> 
+<meta charset = "utf-8">
+<title> EAGLE</title>
+<link rel="stylesheet" href="./material.min.css">
+<link rel="stylesheet" href="./teste.css">
+<link rel="shortcut icon" href="eagle-emblem_38348.png" >
+<script src="./material.min.js"></script> 
+<script src="./scriptcadastro.js"> </script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<div class="center">
+  <form action="#">
+  <div class="mdl-textfield mdl-js-textfield">
+    <input class="mdl-textfield__input no-outline"  type="text" id="sample1">
+    <label class="mdl-textfield__label" for="sample1">Nome</label>
+  </div>
+  <br>
+  <div class="mdl-textfield mdl-js-textfield">
+    <label class="mdl-textfield__label" for="sample2">Usuário</label>
+    <input class="mdl-textfield__input no-outline" type="text" id="sample2" name="usuario">
+  </div>
+  <br>
+  <div class="mdl-textfield mdl-js-textfield">
+    <label class="mdl-textfield__label" for="sample2">Senha</label>
+    <input class="mdl-textfield__input no-outline" type="password" id="sample2" name="senha">
+  </div>
+  <br>
+  <div class="mdl-textfield mdl-js-textfield">
+    <label class="mdl-textfield__label" for="sample2">Confirmar Senha</label>
+    <input class="mdl-textfield__input no-outline" type="password" id="sample2" name="csenha">
+  </div>
+  <br>
+ <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" type="button" onclick="Cadastro()">
+    Button
+  </button> -->
+    <input type="button" onclick="Cadastro()" value="Cadastrar" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"id=btnentrar>
+  
+  </form>
+</div>
